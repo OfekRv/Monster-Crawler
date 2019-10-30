@@ -12,10 +12,11 @@ import mitreCrawler.entities.Group;
 @Named
 @Slf4j
 public class CrawlerSchedulator {
+
 	@Inject
 	Crawler<Group> groupsCrawler;
 
-	@Scheduled(cron = "${cron.expression}") 
+	@Scheduled(cron = "${cron.expression}")
 	public void executeCharts() {
 		log.info("started executing crawler");
 		groupsCrawler.crawl("https://attack.mitre.org/groups/");

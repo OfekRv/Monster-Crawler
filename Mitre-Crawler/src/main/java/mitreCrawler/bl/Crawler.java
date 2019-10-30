@@ -1,5 +1,9 @@
 package mitreCrawler.bl;
 
+import java.util.Collection;
+
+import mitreCrawler.entities.Group;
+
 public interface Crawler<T> {
-	public T crawl(String url);
+	public Collection<Group> crawl(String url);
 }
