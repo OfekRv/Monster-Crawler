@@ -16,7 +16,7 @@ public class Group {
 	private String id;
 	private String version;
 	private String description;
+	private Collection<String> aliases;
 	private Collection<Technique> techniques;
-	private Collection<String> groupDescriptions;
 	private Collection<String> softwares;
 }

@@ -30,8 +30,9 @@ public class GroupsCrawler implements Crawler<Group> {
 			for (String link : groupLinks) {
 				doc = Jsoup.connect(link).get();
 				groups.add(new Group(extractGroupId(doc), extractGroupName(doc), extractGroupVersion(doc),
-						extractGroupDescription(doc), null, null, null));
+						extractGroupDescription(doc), extractGroupAliases(doc), null, null));
 				System.out.println(extractGroupId(doc) + "-" + extractGroupName(doc) + "-" + extractGroupVersion(doc));
+				extractGroupAliases(doc).stream().forEach(alias -> System.out.println(alias));
 				System.out.println(extractGroupDescription(doc));
 			}
 
@@ -73,4 +74,22 @@ public class GroupsCrawler implements Crawler<Group> {
 	private String extractGroupDescription(Document doc) {
 		return doc.getElementsByClass("col-md-8 description-body").text();
 	}
+
+	private Collection<String> extractGroupAliases(Document doc) {
+		Collection<String> aliases = new ArrayList<>();
+		Elements tableValues = doc.getElementsByClass("table table-bordered table-alternate mt-2");
+
+		if (tableValues.size() < 3) {
+			return aliases;
+		}
+
+		tableValues = tableValues.get(0).select("td");
+
+		for (int i = 0; i < tableValues.size(); i += 2) {
+			aliases.add(tableValues.get(i).text());
+		}
+		
+		return aliases;
+	}
+
 }
