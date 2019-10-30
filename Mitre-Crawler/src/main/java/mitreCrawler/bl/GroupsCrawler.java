@@ -12,6 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import mitreCrawler.entities.Group;
+import mitreCrawler.entities.Technique;
 
 @Named
 public class GroupsCrawler implements Crawler<Group> {
@@ -30,8 +31,8 @@ public class GroupsCrawler implements Crawler<Group> {
 			for (String link : groupLinks) {
 				doc = Jsoup.connect(link).get();
 				groups.add(new Group(extractGroupId(doc), extractGroupName(doc), extractGroupVersion(doc),
-						extractGroupDescription(doc), extractGroupAliases(doc), null, null));
-				System.out.println(extractGroupId(doc) + "-" + extractGroupName(doc) + "-" + extractGroupVersion(doc));
+						extractGroupDescription(doc), extractGroupAliases(doc), getGroupTechniques(doc), null));
+				System.out.println(extractGroupName(doc));
 				extractGroupAliases(doc).stream().forEach(alias -> System.out.println(alias));
 				System.out.println(extractGroupDescription(doc));
 			}
@@ -88,8 +89,48 @@ public class GroupsCrawler implements Crawler<Group> {
 		for (int i = 0; i < tableValues.size(); i += 2) {
 			aliases.add(tableValues.get(i).text());
 		}
-		
+
 		return aliases;
 	}
 
+	private Collection<Technique> getGroupTechniques(Document doc) {
+		Collection<Technique> techniques = new ArrayList<>();
+
+		extractGroupTechniquesLinks(doc);
+
+		return techniques;
+	}
+
+	private Collection<String> extractGroupTechniquesLinks(Document doc) {
+		Collection<String> techniquesLinks = new ArrayList<>();
+		Elements tableValues = doc.getElementsByClass("table table-bordered table-alternate mt-2");
+
+		int techniquesTableIndex = 1;
+		if (tableValues.size() == 2) {
+			techniquesTableIndex = 0;
+		}
+
+		if (tableValues.size() == 1) {
+			if (tableValues.select("h2").is("Techniques Used")) {
+				techniquesTableIndex = 0;
+			} else {
+				return techniquesLinks;
+			}
+		}
+
+		tableValues = tableValues.get(techniquesTableIndex).select("td");
+
+		for (int i = 0; i < tableValues.size(); i += 2) {
+			Elements raw = tableValues.get(i).select("a");
+			if (raw.size() > 0) {
+				String link = raw.first().absUrl("href");
+				if (!link.equals("")) {
+					System.out.println(link);
+					techniquesLinks.add(link);
+				}
+			}
+		}
+
+		return techniquesLinks;
+	}
 }
