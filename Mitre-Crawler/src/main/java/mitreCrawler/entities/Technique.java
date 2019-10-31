@@ -13,6 +13,6 @@ public class Technique {
 	private String name;
 	private String id;
 	private String version;
-	private String tactic;
+	private String[] tactic;
 	private String description;
 }

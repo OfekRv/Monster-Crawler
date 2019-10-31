@@ -17,9 +17,13 @@ import mitreCrawler.entities.Technique;
 @Named
 public class GroupsCrawler implements Crawler<Group> {
 	private static final int ID_INDEX = 0;
+	private static final int TACTIC_INDEX = 1;
 
 	private static final int ID_PREFIX_CHAR_COUNT = 4;
+	private static final int TACTIC_PREFIX_CHAR_COUNT = 6;
 	private static final int VERSION_PREFIX_CHAR_COUNT = 9;
+
+	private static final String TACTICS_SEPERATOR = ",";
 
 	@Override
 	public Collection<Group> crawl(String url) {
@@ -30,11 +34,10 @@ public class GroupsCrawler implements Crawler<Group> {
 
 			for (String link : groupLinks) {
 				doc = Jsoup.connect(link).get();
-				groups.add(new Group(extractGroupId(doc), extractGroupName(doc), extractGroupVersion(doc),
-						extractGroupDescription(doc), extractGroupAliases(doc), getGroupTechniques(doc), null));
-				System.out.println(extractGroupName(doc));
-				extractGroupAliases(doc).stream().forEach(alias -> System.out.println(alias));
-				System.out.println(extractGroupDescription(doc));
+				groups.add(new Group(extractId(doc), extractName(doc), extractVersion(doc), extractDescription(doc),
+						extractGroupAliases(doc), getGroupTechniques(doc), null));
+				System.out.println();
+				System.out.println(extractName(doc));
 			}
 
 		} catch (IOException e) {
@@ -49,15 +52,11 @@ public class GroupsCrawler implements Crawler<Group> {
 				.map(link -> link.absUrl("href")).collect(Collectors.toList());
 	}
 
-	private String extractGroupName(Document doc) {
-		return doc.select("h1").text();
-	}
-
-	private String extractGroupId(Document doc) {
+	private String extractId(Document doc) {
 		return doc.getElementsByClass("card-data").get(ID_INDEX).text().substring(ID_PREFIX_CHAR_COUNT);
 	}
 
-	private String extractGroupVersion(Document doc) {
+	private String extractVersion(Document doc) {
 		Elements details = doc.getElementsByClass("card-data");
 
 		int versionIndex = 1;
@@ -72,7 +71,7 @@ public class GroupsCrawler implements Crawler<Group> {
 		return details.get(versionIndex).text().substring(VERSION_PREFIX_CHAR_COUNT);
 	}
 
-	private String extractGroupDescription(Document doc) {
+	private String extractDescription(Document doc) {
 		return doc.getElementsByClass("col-md-8 description-body").text();
 	}
 
@@ -94,11 +93,29 @@ public class GroupsCrawler implements Crawler<Group> {
 	}
 
 	private Collection<Technique> getGroupTechniques(Document doc) {
-		Collection<Technique> techniques = new ArrayList<>();
+		return extractGroupTechniquesLinks(doc).stream().map(link -> getTechniqueFromLink(link))
+				.collect(Collectors.toCollection(ArrayList::new));
+	}
 
-		extractGroupTechniquesLinks(doc);
+	private Technique getTechniqueFromLink(String url) {
+		try {
+			Document doc = Jsoup.connect(url).get();
+			new Technique(extractName(doc), extractId(doc), extractVersion(doc), extractTactics(doc),
+					extractDescription(doc));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		return techniques;
+		return null;
+	}
+
+	private String[] extractTactics(Document doc) {
+		return doc.getElementsByClass("card-data").get(TACTIC_INDEX).text().substring(TACTIC_PREFIX_CHAR_COUNT)
+				.split(TACTICS_SEPERATOR);
+	}
+
+	private String extractName(Document doc) {
+		return doc.select("h1").text();
 	}
 
 	private Collection<String> extractGroupTechniquesLinks(Document doc) {
@@ -125,7 +142,6 @@ public class GroupsCrawler implements Crawler<Group> {
 			if (raw.size() > 0) {
 				String link = raw.first().absUrl("href");
 				if (!link.equals("")) {
-					System.out.println(link);
 					techniquesLinks.add(link);
 				}
 			}
