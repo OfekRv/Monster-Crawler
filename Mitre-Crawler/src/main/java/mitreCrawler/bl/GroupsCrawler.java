@@ -20,7 +20,7 @@ public class GroupsCrawler implements Crawler<Group> {
 	private static final int TACTIC_INDEX = 1;
 
 	private static final int ID_PREFIX_CHAR_COUNT = 4;
-	private static final int TACTIC_PREFIX_CHAR_COUNT = 6;
+	private static final int TACTIC_PREFIX_CHAR_COUNT = 8;
 	private static final int VERSION_PREFIX_CHAR_COUNT = 9;
 
 	private static final String TACTICS_SEPERATOR = ",";
@@ -36,8 +36,6 @@ public class GroupsCrawler implements Crawler<Group> {
 				doc = Jsoup.connect(link).get();
 				groups.add(new Group(extractId(doc), extractName(doc), extractVersion(doc), extractDescription(doc),
 						extractGroupAliases(doc), getGroupTechniques(doc), null));
-				System.out.println();
-				System.out.println(extractName(doc));
 			}
 
 		} catch (IOException e) {
@@ -110,8 +108,12 @@ public class GroupsCrawler implements Crawler<Group> {
 	}
 
 	private String[] extractTactics(Document doc) {
-		return doc.getElementsByClass("card-data").get(TACTIC_INDEX).text().substring(TACTIC_PREFIX_CHAR_COUNT)
-				.split(TACTICS_SEPERATOR);
+		Elements details = doc.getElementsByClass("card-data");
+		if (details.size() == 2) {
+			return new String[0];
+		}
+
+		return details.get(TACTIC_INDEX).text().substring(TACTIC_PREFIX_CHAR_COUNT).split(TACTICS_SEPERATOR);
 	}
 
 	private String extractName(Document doc) {
