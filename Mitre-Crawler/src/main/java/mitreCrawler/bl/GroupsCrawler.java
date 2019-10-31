@@ -12,12 +12,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import mitreCrawler.entities.Group;
+import mitreCrawler.entities.Software;
 import mitreCrawler.entities.Technique;
 
 @Named
 public class GroupsCrawler implements Crawler<Group> {
 	private static final int ID_INDEX = 0;
 	private static final int TACTIC_INDEX = 1;
+	private static final int SOFTWAR_INDEX = 1;
 
 	private static final int ID_PREFIX_CHAR_COUNT = 4;
 	private static final int TACTIC_PREFIX_CHAR_COUNT = 8;
@@ -35,7 +37,7 @@ public class GroupsCrawler implements Crawler<Group> {
 			for (String link : groupLinks) {
 				doc = Jsoup.connect(link).get();
 				groups.add(new Group(extractId(doc), extractName(doc), extractVersion(doc), extractDescription(doc),
-						extractGroupAliases(doc), getGroupTechniques(doc), null));
+						extractGroupAliases(doc), getGroupTechniques(doc), getGroupSoftwares(doc)));
 			}
 
 		} catch (IOException e) {
@@ -116,6 +118,22 @@ public class GroupsCrawler implements Crawler<Group> {
 		return details.get(TACTIC_INDEX).text().substring(TACTIC_PREFIX_CHAR_COUNT).split(TACTICS_SEPERATOR);
 	}
 
+	private Collection<Software> getGroupSoftwares(Document doc) {
+		return extractGroupSoftwaresLinks(doc).stream().map(link -> getSoftwareFromLink(link))
+				.collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	private Software getSoftwareFromLink(String url) {
+		try {
+			Document doc = Jsoup.connect(url).get();
+			new Software(extractName(doc), extractId(doc), extractVersion(doc), extractDescription(doc));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 	private String extractName(Document doc) {
 		return doc.select("h1").text();
 	}
@@ -150,5 +168,31 @@ public class GroupsCrawler implements Crawler<Group> {
 		}
 
 		return techniquesLinks;
+	}
+
+	private Collection<String> extractGroupSoftwaresLinks(Document doc) {
+		Collection<String> softwaresLinks = new ArrayList<>();
+		Elements tableValues = doc.getElementsByClass("table table-bordered table-alternate mt-2");
+
+		int softwaresTableIndex = 2;
+		if (tableValues.size() == 2) {
+			softwaresTableIndex = 1;
+		}
+
+		if (tableValues.size() == 1) {
+			if (tableValues.select("h2").is("Software")) {
+				softwaresTableIndex = 0;
+			} else {
+				return softwaresLinks;
+			}
+		}
+
+		tableValues = tableValues.get(softwaresTableIndex).select("tr").next();
+
+		for (int i = 0; i < tableValues.size(); i++) {
+			softwaresLinks.add(tableValues.get(i).select("td").get(SOFTWAR_INDEX).select("a").first().absUrl("href"));
+		}
+
+		return softwaresLinks;
 	}
 }

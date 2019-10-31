@@ -15,3 +15,5 @@ public class Software {
 	private String version;
 	private String description;
 }
+
+// tech used, platform, type

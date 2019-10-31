@@ -18,5 +18,5 @@ public class Group {
 	private String description;
 	private Collection<String> aliases;
 	private Collection<Technique> techniques;
-	private Collection<String> softwares;
+	private Collection<Software> softwares;
 }
