@@ -60,7 +60,7 @@ public class GroupsCrawler implements Crawler<Group> {
 				currentGroup = new Group(extractId(doc), groupName, extractDescription(doc), extractGroupAliases(doc),
 						getGroupTechniques(doc), getGroupSoftwares(doc));
 				crawledGroups.add(currentGroup);
-				groupsRepository.save(currentGroup);
+				groupsRepository.saveAndFlush(currentGroup);
 			}
 
 		} catch (IOException e) {
@@ -80,7 +80,7 @@ public class GroupsCrawler implements Crawler<Group> {
 	}
 
 	private String extractDescription(Document doc) {
-		return doc.getElementsByClass("col-md-8 description-body").text();
+		return doc.getElementsByClass("col-md-8 description-body").select("p").text();
 	}
 
 	private Collection<String> extractGroupAliases(Document doc) {
@@ -107,7 +107,7 @@ public class GroupsCrawler implements Crawler<Group> {
 		}
 
 		techniques.stream().filter(technique -> technique != null)
-				.forEach(technique -> techniquesRepository.save(technique));
+				.forEach(technique -> techniquesRepository.saveAndFlush(technique));
 		return techniques;
 	}
 
@@ -142,7 +142,8 @@ public class GroupsCrawler implements Crawler<Group> {
 			softwares.add(getSoftwareFromLink(techniqueLink));
 		}
 
-		softwares.stream().filter(software -> software != null).forEach(software -> softwaresRepository.save(software));
+		softwares.stream().filter(software -> software != null)
+				.forEach(software -> softwaresRepository.saveAndFlush(software));
 		return softwares;
 	}
 

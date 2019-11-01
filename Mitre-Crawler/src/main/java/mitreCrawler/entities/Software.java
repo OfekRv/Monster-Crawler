@@ -24,7 +24,7 @@ public class Software {
 	@Id
 	@JoinColumn(name = "software_id")
 	private String id;
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false, unique = false)
 	private String name;
 	// @Column(nullable = false, unique = false)
 	// private String contentVersion;

@@ -10,7 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
@@ -36,8 +35,7 @@ public class Group {
 	private String name;
 	// @Column(nullable = false, unique = false)
 	// private String contentVersion;
-	@Lob
-	@Column(nullable = true, unique = false)
+	@Column(length = 50000, nullable = true, unique = false)
 	private String description;
 	@ElementCollection
 	@Column(nullable = true, unique = false)
