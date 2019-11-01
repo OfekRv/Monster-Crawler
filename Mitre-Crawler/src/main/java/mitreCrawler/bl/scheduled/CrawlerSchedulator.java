@@ -12,7 +12,6 @@ import mitreCrawler.entities.Group;
 @Named
 @Slf4j
 public class CrawlerSchedulator {
-
 	@Inject
 	Crawler<Group> groupsCrawler;
 

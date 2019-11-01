@@ -2,20 +2,29 @@ package mitreCrawler.bl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import lombok.extern.slf4j.Slf4j;
 import mitreCrawler.entities.Group;
 import mitreCrawler.entities.Software;
 import mitreCrawler.entities.Technique;
+import mitreCrawler.repositories.GroupRepository;
+import mitreCrawler.repositories.SoftwareRepository;
+import mitreCrawler.repositories.TechniqueRepository;
 
 @Named
+@Slf4j
 public class GroupsCrawler implements Crawler<Group> {
 	private static final int ID_INDEX = 0;
 	private static final int TACTIC_INDEX = 1;
@@ -27,24 +36,38 @@ public class GroupsCrawler implements Crawler<Group> {
 
 	private static final String TACTICS_SEPERATOR = ",";
 
+	@Inject
+	private GroupRepository groupsRepository;
+
+	@Inject
+	private SoftwareRepository softwaresRepository;
+
+	@Inject
+	private TechniqueRepository techniquesRepository;
+
 	@Override
 	public Collection<Group> crawl(String url) {
-		Collection<Group> groups = new ArrayList<Group>();
+		Collection<Group> crawledGroups = new ArrayList<Group>();
 		try {
 			Document doc = Jsoup.connect(url).get();
 			Collection<String> groupLinks = extractGroupLinksElements(doc);
 
+			Group currentGroup;
 			for (String link : groupLinks) {
 				doc = Jsoup.connect(link).get();
-				groups.add(new Group(extractId(doc), extractName(doc), extractVersion(doc), extractDescription(doc),
-						extractGroupAliases(doc), getGroupTechniques(doc), getGroupSoftwares(doc)));
+				String groupName = extractName(doc);
+				log.info("[GROUP] getting \"" + groupName + "\"");
+				currentGroup = new Group(extractId(doc), groupName, extractVersion(doc), extractDescription(doc),
+						extractGroupAliases(doc), getGroupTechniques(doc), getGroupSoftwares(doc));
+				crawledGroups.add(currentGroup);
+				groupsRepository.save(currentGroup);
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return groups;
+		return crawledGroups;
 	}
 
 	private Collection<String> extractGroupLinksElements(Document doc) {
@@ -92,46 +115,71 @@ public class GroupsCrawler implements Crawler<Group> {
 		return aliases;
 	}
 
-	private Collection<Technique> getGroupTechniques(Document doc) {
-		return extractGroupTechniquesLinks(doc).stream().map(link -> getTechniqueFromLink(link))
-				.collect(Collectors.toCollection(ArrayList::new));
+	private Set<Technique> getGroupTechniques(Document doc) {
+		Set<Technique> techniques = new HashSet<>();
+		for (String techniqueLink : extractGroupTechniquesLinks(doc)) {
+			techniques.add(getTechniqueFromLink(techniqueLink));
+		}
+
+		techniques.stream().filter(technique -> technique != null).forEach(technique -> {
+			System.out.println(technique.getId());
+			System.out.println(technique.getName());
+			System.out.println(technique.getContentVersion());
+			System.out.println(technique.getTactic().size());
+			System.out.println(technique.getDescription().length());
+			techniquesRepository.save(technique);
+		});
+		return techniques;
 	}
 
 	private Technique getTechniqueFromLink(String url) {
+		Technique technique = null;
 		try {
 			Document doc = Jsoup.connect(url).get();
-			new Technique(extractName(doc), extractId(doc), extractVersion(doc), extractTactics(doc),
+			String techniqueName = extractName(doc);
+			log.info("[TECHNIQUE] getting \"" + techniqueName + "\"");
+			technique = new Technique(extractId(doc), techniqueName, extractVersion(doc), extractTactics(doc),
 					extractDescription(doc));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return null;
+		return technique;
 	}
 
-	private String[] extractTactics(Document doc) {
+	private Collection<String> extractTactics(Document doc) {
+		Collection<String> tactics = new ArrayList<>();
 		Elements details = doc.getElementsByClass("card-data");
 		if (details.size() == 2) {
-			return new String[0];
+			return tactics;
 		}
 
-		return details.get(TACTIC_INDEX).text().substring(TACTIC_PREFIX_CHAR_COUNT).split(TACTICS_SEPERATOR);
+		return tactics = new ArrayList<String>(Arrays
+				.asList(details.get(TACTIC_INDEX).text().substring(TACTIC_PREFIX_CHAR_COUNT).split(TACTICS_SEPERATOR)));
 	}
 
-	private Collection<Software> getGroupSoftwares(Document doc) {
-		return extractGroupSoftwaresLinks(doc).stream().map(link -> getSoftwareFromLink(link))
-				.collect(Collectors.toCollection(ArrayList::new));
+	private Set<Software> getGroupSoftwares(Document doc) {
+		Set<Software> softwares = new HashSet<>();
+		for (String techniqueLink : extractGroupSoftwaresLinks(doc)) {
+			softwares.add(getSoftwareFromLink(techniqueLink));
+		}
+
+		softwares.stream().filter(software -> software != null).forEach(software -> softwaresRepository.save(software));
+		return softwares;
 	}
 
 	private Software getSoftwareFromLink(String url) {
+		Software software = null;
 		try {
 			Document doc = Jsoup.connect(url).get();
-			new Software(extractName(doc), extractId(doc), extractVersion(doc), extractDescription(doc));
+			String softwareName = extractName(doc);
+			log.info("[SOFTWARE] getting \"" + softwareName + "\"");
+			software = new Software(extractId(doc), softwareName, extractVersion(doc), extractDescription(doc));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		return null;
+		softwaresRepository.save(software);
+		return software;
 	}
 
 	private String extractName(Document doc) {
