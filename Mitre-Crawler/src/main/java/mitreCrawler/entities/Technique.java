@@ -29,8 +29,8 @@ public class Technique {
 	private String id;
 	@Column(nullable = false, unique = true)
 	private String name;
-	@Column(nullable = false, unique = false)
-	private String contentVersion;
+	//@Column(nullable = false, unique = false)
+	//private String contentVersion;
 	@ElementCollection
 	@Column(nullable = true, unique = false)
 	private Collection<String> tactic;

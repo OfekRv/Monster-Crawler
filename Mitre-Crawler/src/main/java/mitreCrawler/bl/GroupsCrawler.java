@@ -57,8 +57,8 @@ public class GroupsCrawler implements Crawler<Group> {
 				doc = Jsoup.connect(link).get();
 				String groupName = extractName(doc);
 				log.info("[GROUP] getting \"" + groupName + "\"");
-				currentGroup = new Group(extractId(doc), groupName, extractVersion(doc), extractDescription(doc),
-						extractGroupAliases(doc), getGroupTechniques(doc), getGroupSoftwares(doc));
+				currentGroup = new Group(extractId(doc), groupName, extractDescription(doc), extractGroupAliases(doc),
+						getGroupTechniques(doc), getGroupSoftwares(doc));
 				crawledGroups.add(currentGroup);
 				groupsRepository.save(currentGroup);
 			}
@@ -77,21 +77,6 @@ public class GroupsCrawler implements Crawler<Group> {
 
 	private String extractId(Document doc) {
 		return doc.getElementsByClass("card-data").get(ID_INDEX).text().substring(ID_PREFIX_CHAR_COUNT);
-	}
-
-	private String extractVersion(Document doc) {
-		Elements details = doc.getElementsByClass("card-data");
-
-		int versionIndex = 1;
-		if (details.size() == 3) {
-			versionIndex = 2;
-		}
-
-		if (details.size() == 4) {
-			versionIndex = 3;
-		}
-
-		return details.get(versionIndex).text().substring(VERSION_PREFIX_CHAR_COUNT);
 	}
 
 	private String extractDescription(Document doc) {
@@ -121,14 +106,8 @@ public class GroupsCrawler implements Crawler<Group> {
 			techniques.add(getTechniqueFromLink(techniqueLink));
 		}
 
-		techniques.stream().filter(technique -> technique != null).forEach(technique -> {
-			System.out.println(technique.getId());
-			System.out.println(technique.getName());
-			System.out.println(technique.getContentVersion());
-			System.out.println(technique.getTactic().size());
-			System.out.println(technique.getDescription().length());
-			techniquesRepository.save(technique);
-		});
+		techniques.stream().filter(technique -> technique != null)
+				.forEach(technique -> techniquesRepository.save(technique));
 		return techniques;
 	}
 
@@ -138,8 +117,7 @@ public class GroupsCrawler implements Crawler<Group> {
 			Document doc = Jsoup.connect(url).get();
 			String techniqueName = extractName(doc);
 			log.info("[TECHNIQUE] getting \"" + techniqueName + "\"");
-			technique = new Technique(extractId(doc), techniqueName, extractVersion(doc), extractTactics(doc),
-					extractDescription(doc));
+			technique = new Technique(extractId(doc), techniqueName, extractTactics(doc), extractDescription(doc));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -174,7 +152,7 @@ public class GroupsCrawler implements Crawler<Group> {
 			Document doc = Jsoup.connect(url).get();
 			String softwareName = extractName(doc);
 			log.info("[SOFTWARE] getting \"" + softwareName + "\"");
-			software = new Software(extractId(doc), softwareName, extractVersion(doc), extractDescription(doc));
+			software = new Software(extractId(doc), softwareName, extractDescription(doc));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

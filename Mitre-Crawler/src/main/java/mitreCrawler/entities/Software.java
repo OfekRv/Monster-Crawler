@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -27,10 +26,9 @@ public class Software {
 	private String id;
 	@Column(nullable = false, unique = true)
 	private String name;
-	@Column(nullable = false, unique = false)
-	private String contentVersion;
-	@Lob
-	@Column(nullable = true, unique = false)
+	// @Column(nullable = false, unique = false)
+	// private String contentVersion;
+	@Column(length = 50000, nullable = true, unique = false)
 	private String description;
 }
 
