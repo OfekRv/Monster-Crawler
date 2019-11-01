@@ -181,7 +181,7 @@ public class GroupsCrawler implements Crawler<Group> {
 			}
 		}
 
-		tableValues = tableValues.get(techniquesTableIndex).select("td");
+		tableValues = tableValues.get(techniquesTableIndex).select("tbody").select("tr");
 
 		for (int i = 0; i < tableValues.size(); i += 2) {
 			Elements raw = tableValues.get(i).select("a");
@@ -213,7 +213,7 @@ public class GroupsCrawler implements Crawler<Group> {
 			}
 		}
 
-		tableValues = tableValues.get(softwaresTableIndex).select("tr").next();
+		tableValues = tableValues.get(softwaresTableIndex).select("tbody").select("tr");
 
 		for (int i = 0; i < tableValues.size(); i++) {
 			softwaresLinks.add(tableValues.get(i).select("td").get(SOFTWAR_INDEX).select("a").first().absUrl("href"));
