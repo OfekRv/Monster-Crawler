@@ -13,6 +13,7 @@ import javax.inject.Named;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,8 @@ import mitreCrawler.repositories.TechniqueRepository;
 public class GroupsCrawler implements Crawler<Group> {
 	private static final int ID_INDEX = 0;
 	private static final int TACTIC_INDEX = 1;
-	private static final int SOFTWAR_INDEX = 1;
+	private static final int SOFTWARE_INDEX = 1;
+	private static final int TECHNIQUE_INDEX = 2;
 
 	private static final int ID_PREFIX_CHAR_COUNT = 4;
 	private static final int TACTIC_PREFIX_CHAR_COUNT = 8;
@@ -45,8 +47,7 @@ public class GroupsCrawler implements Crawler<Group> {
 	private TechniqueRepository techniquesRepository;
 
 	@Override
-	public Collection<Group> crawl(String url) {
-		Collection<Group> crawledGroups = new ArrayList<Group>();
+	public void crawl(String url) {
 		try {
 			Document doc = Jsoup.connect(url).get();
 			Collection<String> groupLinks = extractGroupLinksElements(doc);
@@ -58,28 +59,16 @@ public class GroupsCrawler implements Crawler<Group> {
 				log.info("[GROUP] getting \"" + groupName + "\"");
 				currentGroup = new Group(extractId(doc), groupName, extractDescription(doc), extractGroupAliases(doc),
 						getGroupTechniques(doc), getGroupSoftwares(doc));
-				crawledGroups.add(currentGroup);
 				groupsRepository.saveAndFlush(currentGroup);
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		return crawledGroups;
 	}
 
 	private Collection<String> extractGroupLinksElements(Document doc) {
 		return doc.getElementsByClass("group-nav-desktop-view").select("a").next().stream()
 				.map(link -> link.absUrl("href")).collect(Collectors.toList());
-	}
-
-	private String extractId(Document doc) {
-		return doc.getElementsByClass("card-data").get(ID_INDEX).text().substring(ID_PREFIX_CHAR_COUNT);
-	}
-
-	private String extractDescription(Document doc) {
-		return doc.getElementsByClass("col-md-8 description-body").select("p").text();
 	}
 
 	private Collection<String> extractGroupAliases(Document doc) {
@@ -97,31 +86,6 @@ public class GroupsCrawler implements Crawler<Group> {
 		}
 
 		return aliases;
-	}
-
-	private Set<Technique> getGroupTechniques(Document doc) {
-		Set<Technique> techniques = new HashSet<>();
-		for (String techniqueLink : extractGroupTechniquesLinks(doc)) {
-			techniques.add(getTechniqueFromLink(techniqueLink));
-		}
-
-		techniques.stream().filter(technique -> technique != null)
-				.forEach(technique -> techniquesRepository.saveAndFlush(technique));
-		return techniques;
-	}
-
-	private Technique getTechniqueFromLink(String url) {
-		Technique technique = null;
-		try {
-			Document doc = Jsoup.connect(url).get();
-			String techniqueName = extractName(doc);
-			log.info("[TECHNIQUE] getting \"" + techniqueName + "\"");
-			technique = new Technique(extractId(doc), techniqueName, extractTactics(doc), extractDescription(doc));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return technique;
 	}
 
 	private Collection<String> extractTactics(Document doc) {
@@ -146,6 +110,67 @@ public class GroupsCrawler implements Crawler<Group> {
 		return softwares;
 	}
 
+	private Set<Technique> getGroupTechniques(Document doc) {
+		Set<Technique> techniques = new HashSet<>();
+		for (String techniqueLink : extractGroupTechniquesLinks(doc)) {
+			techniques.add(getTechniqueFromLink(techniqueLink));
+		}
+
+		techniques.stream().filter(technique -> technique != null)
+				.forEach(technique -> techniquesRepository.saveAndFlush(technique));
+		return techniques;
+	}
+
+	private Collection<String> extractGroupTechniquesLinks(Document doc) {
+		Collection<String> techniquesLinks = new ArrayList<>();
+		Elements tables = doc.getElementsByClass("table table-bordered table-alternate mt-2");
+
+		for (int i = 0; i < tables.size(); i++) {
+			Element currentTable = tables.get(i);
+			if (firstColumnNameOfTable(currentTable.getAllElements()).text().equals("Domain")) {
+				Elements rows = currentTable.select("tbody").select("tr");
+				for (int j = 0; j < rows.size(); j++) {
+					techniquesLinks
+							.add(rows.get(j).select("td").get(TECHNIQUE_INDEX).select("a").first().absUrl("href"));
+				}
+			}
+		}
+
+		return techniquesLinks;
+	}
+
+	private Technique getTechniqueFromLink(String url) {
+		Technique technique = null;
+		try {
+			Document doc = Jsoup.connect(url).get();
+			String techniqueName = extractName(doc);
+			log.info("[TECHNIQUE] getting \"" + techniqueName + "\"");
+			technique = new Technique(extractId(doc), techniqueName, extractTactics(doc), extractDescription(doc));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return technique;
+	}
+
+	private Collection<String> extractGroupSoftwaresLinks(Document doc) {
+
+		Collection<String> softwaresLinks = new ArrayList<>();
+		Elements tables = doc.getElementsByClass("table table-bordered table-alternate mt-2");
+
+		for (int i = 0; i < tables.size(); i++) {
+			Element currentTable = tables.get(i);
+			if (firstColumnNameOfTable(currentTable.getAllElements()).text().equals("ID")) {
+				Elements rows = currentTable.select("tbody").select("tr");
+				for (int j = 0; j < rows.size(); j++) {
+					softwaresLinks.add(rows.get(j).select("td").get(SOFTWARE_INDEX).select("a").first().absUrl("href"));
+				}
+			}
+		}
+
+		return softwaresLinks;
+	}
+
 	private Software getSoftwareFromLink(String url) {
 		Software software = null;
 		try {
@@ -160,65 +185,19 @@ public class GroupsCrawler implements Crawler<Group> {
 		return software;
 	}
 
+	private String extractId(Document doc) {
+		return doc.getElementsByClass("card-data").get(ID_INDEX).text().substring(ID_PREFIX_CHAR_COUNT);
+	}
+
+	private String extractDescription(Document doc) {
+		return doc.getElementsByClass("col-md-8 description-body").select("p").text();
+	}
+
 	private String extractName(Document doc) {
 		return doc.select("h1").text();
 	}
 
-	private Collection<String> extractGroupTechniquesLinks(Document doc) {
-		Collection<String> techniquesLinks = new ArrayList<>();
-		Elements tableValues = doc.getElementsByClass("table table-bordered table-alternate mt-2");
-
-		int techniquesTableIndex = 1;
-		if (tableValues.size() == 2) {
-			techniquesTableIndex = 0;
-		}
-
-		if (tableValues.size() == 1) {
-			if (tableValues.select("h2").is("Techniques Used")) {
-				techniquesTableIndex = 0;
-			} else {
-				return techniquesLinks;
-			}
-		}
-
-		tableValues = tableValues.get(techniquesTableIndex).select("tbody").select("tr");
-
-		for (int i = 0; i < tableValues.size(); i += 2) {
-			Elements raw = tableValues.get(i).select("a");
-			if (raw.size() > 0) {
-				String link = raw.first().absUrl("href");
-				if (!link.equals("")) {
-					techniquesLinks.add(link);
-				}
-			}
-		}
-
-		return techniquesLinks;
-	}
-
-	private Collection<String> extractGroupSoftwaresLinks(Document doc) {
-		Collection<String> softwaresLinks = new ArrayList<>();
-		Elements tableValues = doc.getElementsByClass("table table-bordered table-alternate mt-2");
-
-		int softwaresTableIndex = 2;
-		if (tableValues.size() == 2) {
-			softwaresTableIndex = 1;
-		}
-
-		if (tableValues.size() == 1) {
-			if (tableValues.select("h2").is("Software")) {
-				softwaresTableIndex = 0;
-			} else {
-				return softwaresLinks;
-			}
-		}
-
-		tableValues = tableValues.get(softwaresTableIndex).select("tbody").select("tr");
-
-		for (int i = 0; i < tableValues.size(); i++) {
-			softwaresLinks.add(tableValues.get(i).select("td").get(SOFTWAR_INDEX).select("a").first().absUrl("href"));
-		}
-
-		return softwaresLinks;
+	private Element firstColumnNameOfTable(Elements tableValues) {
+		return tableValues.select("th").first();
 	}
 }
