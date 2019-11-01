@@ -32,7 +32,6 @@ public class GroupsCrawler implements Crawler<Group> {
 
 	private static final int ID_PREFIX_CHAR_COUNT = 4;
 	private static final int TACTIC_PREFIX_CHAR_COUNT = 8;
-	private static final int VERSION_PREFIX_CHAR_COUNT = 9;
 
 	private static final String TACTICS_SEPERATOR = ",";
 
