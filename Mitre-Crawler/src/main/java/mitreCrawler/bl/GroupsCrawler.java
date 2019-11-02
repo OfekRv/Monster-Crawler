@@ -61,13 +61,10 @@ public class GroupsCrawler implements Crawler<Group> {
 			for (String link : groupLinks) {
 				doc = Jsoup.connect(link).get();
 				String groupName = extractName(doc);
-				if (groupName.equals("admin@338")) {
-					log.info("[GROUP] getting \"" + groupName + "\"");
-					currentGroup = new Group(extractId(doc), groupName, extractDescription(doc),
-							extractGroupAliases(doc), getGroupTechniques(doc, changeLog),
-							getGroupSoftwares(doc, changeLog));
-					saveOrUpdate(currentGroup, currentGroup.getId(), groupsRepository, changeLog);
-				}
+				log.info("[GROUP] getting \"" + groupName + "\"");
+				currentGroup = new Group(extractId(doc), groupName, extractDescription(doc), extractGroupAliases(doc),
+						getGroupTechniques(doc, changeLog), getGroupSoftwares(doc, changeLog));
+				saveOrUpdate(currentGroup, currentGroup.getId(), groupsRepository, changeLog);
 			}
 
 			changeLogRepository.save(changeLog);
@@ -87,10 +84,6 @@ public class GroupsCrawler implements Crawler<Group> {
 		} else {
 			changeLog.addChange(repository.saveAndFlush(entity));
 		}
-		/*
-		 * if (!entity.equals(repository.findById(id).get())) {
-		 * changeLog.addChange(repository.saveAndFlush(entity)); }
-		 */
 	}
 
 	private Collection<String> extractGroupLinksElements(Document doc) {

@@ -3,6 +3,7 @@ package mitreCrawler.entities;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -15,7 +16,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -55,11 +55,14 @@ public class Group {
 		if (getClass() != o.getClass())
 			return false;
 		Group g = (Group) o;
-		techniques.forEach(t -> System.out.println(t.getName()));
-		g.techniques.forEach(t -> System.out.println(t.getName() + " $ " + t.getId()));
+
+		Collection<String> groupNames = techniques.stream().map(Technique::getName).collect(Collectors.toList());
+		Collection<String> objectGroupNames = g.techniques.stream().map(Technique::getName)
+				.collect(Collectors.toList());
+
 		return Objects.equals(id, g.id) && Objects.equals(name, g.name) && Objects.equals(description, g.description)
 				&& aliases.containsAll(g.aliases) && g.aliases.containsAll(aliases)
-				&& techniques.containsAll(g.techniques) && g.techniques.containsAll(techniques)
+				&& groupNames.containsAll(objectGroupNames) && objectGroupNames.containsAll(groupNames)
 				&& softwares.containsAll(g.softwares) && g.softwares.containsAll(softwares);
 	}
 }
