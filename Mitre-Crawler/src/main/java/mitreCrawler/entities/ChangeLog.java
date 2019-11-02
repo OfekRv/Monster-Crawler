@@ -39,8 +39,15 @@ public class ChangeLog {
 	@JoinTable(name = "atk_techniques_in_change_log", joinColumns = @JoinColumn(name = "change_log_id"), inverseJoinColumns = @JoinColumn(name = "technique_id"))
 	private Set<Technique> techniques;
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "atk_softwares_in_change_log", joinColumns = @JoinColumn(name = "change_log_id"), inverseJoinColumns = @JoinColumn(name = "softwares_id"))
+	@JoinTable(name = "atk_softwares_in_change_log", joinColumns = @JoinColumn(name = "change_log_id"), inverseJoinColumns = @JoinColumn(name = "software_id"))
 	private Set<Software> softwares;
+
+	public ChangeLog() {
+		date = LocalDate.now();
+		groups = new HashSet<Group>();
+		techniques = new HashSet<Technique>();
+		softwares = new HashSet<Software>();
+	}
 
 	public <E> void addChange(E changedEntity) {
 		if (changedEntity.getClass().equals(Group.class)) {
@@ -54,10 +61,7 @@ public class ChangeLog {
 		}
 	}
 
-	public ChangeLog() {
-		date = LocalDate.now();
-		groups = new HashSet<Group>();
-		techniques = new HashSet<Technique>();
-		softwares = new HashSet<Software>();
+	public boolean contanisChange() {
+		return !groups.isEmpty() && !techniques.isEmpty() && !softwares.isEmpty();
 	}
 }

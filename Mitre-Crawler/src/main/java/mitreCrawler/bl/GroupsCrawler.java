@@ -67,7 +67,9 @@ public class GroupsCrawler implements Crawler<Group> {
 				saveOrUpdate(currentGroup, currentGroup.getId(), groupsRepository, changeLog);
 			}
 
-			changeLogRepository.save(changeLog);
+			if (changeLog.contanisChange()) {
+				changeLogRepository.save(changeLog);
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();

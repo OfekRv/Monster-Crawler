@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -37,6 +38,7 @@ public class Group {
 	@Column(length = 50000, nullable = true, unique = false)
 	private String description;
 	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "atk_group_aliases")
 	@Column(nullable = true, unique = false)
 	private Collection<String> aliases;
 	@ManyToMany(fetch = FetchType.EAGER)
