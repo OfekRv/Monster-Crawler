@@ -69,6 +69,9 @@ public class GroupsCrawler implements Crawler<Group> {
 
 			if (changeLog.contanisChange()) {
 				changeLogRepository.save(changeLog);
+				log.info("change log saved");
+			} else {
+				log.info("no changes detected");
 			}
 
 		} catch (IOException e) {
