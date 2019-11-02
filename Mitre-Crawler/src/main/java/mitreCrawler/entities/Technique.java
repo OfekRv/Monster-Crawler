@@ -1,16 +1,17 @@
 package mitreCrawler.entities;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +21,6 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Getter
 @Setter
 public class Technique {
@@ -29,11 +29,24 @@ public class Technique {
 	private String id;
 	@Column(nullable = false, unique = false)
 	private String name;
-	//@Column(nullable = false, unique = false)
-	//private String contentVersion;
-	@ElementCollection
+	// @Column(nullable = false, unique = false)
+	// private String contentVersion;
+	@ElementCollection(fetch = FetchType.EAGER)
 	@Column(nullable = true, unique = false)
 	private Collection<String> tactic;
 	@Column(length = 50000, nullable = true, unique = false)
 	private String description;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null)
+			return false;
+		if (getClass() != o.getClass())
+			return false;
+		Technique t = (Technique) o;
+		return Objects.equals(id, t.id) && Objects.equals(name, t.name) && Objects.equals(description, t.description)
+				&& tactic.containsAll(t.tactic) && t.tactic.containsAll(tactic);
+	}
 }

@@ -1,6 +1,7 @@
 package mitreCrawler.entities;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -21,10 +22,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "atk_groups")
-
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Getter
 @Setter
 public class Group {
@@ -37,7 +36,7 @@ public class Group {
 	// private String contentVersion;
 	@Column(length = 50000, nullable = true, unique = false)
 	private String description;
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@Column(nullable = true, unique = false)
 	private Collection<String> aliases;
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -46,4 +45,21 @@ public class Group {
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "atk_softwares_in_groups", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "software_id"))
 	private Set<Software> softwares;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null)
+			return false;
+		if (getClass() != o.getClass())
+			return false;
+		Group g = (Group) o;
+		techniques.forEach(t -> System.out.println(t.getName()));
+		g.techniques.forEach(t -> System.out.println(t.getName() + " $ " + t.getId()));
+		return Objects.equals(id, g.id) && Objects.equals(name, g.name) && Objects.equals(description, g.description)
+				&& aliases.containsAll(g.aliases) && g.aliases.containsAll(aliases)
+				&& techniques.containsAll(g.techniques) && g.techniques.containsAll(techniques)
+				&& softwares.containsAll(g.softwares) && g.softwares.containsAll(softwares);
+	}
 }

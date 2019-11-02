@@ -15,11 +15,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import lombok.extern.slf4j.Slf4j;
+import mitreCrawler.entities.ChangeLog;
 import mitreCrawler.entities.Group;
 import mitreCrawler.entities.Software;
 import mitreCrawler.entities.Technique;
+import mitreCrawler.repositories.ChangeLogRepository;
 import mitreCrawler.repositories.GroupRepository;
 import mitreCrawler.repositories.SoftwareRepository;
 import mitreCrawler.repositories.TechniqueRepository;
@@ -39,12 +42,12 @@ public class GroupsCrawler implements Crawler<Group> {
 
 	@Inject
 	private GroupRepository groupsRepository;
-
 	@Inject
 	private SoftwareRepository softwaresRepository;
-
 	@Inject
 	private TechniqueRepository techniquesRepository;
+	@Inject
+	private ChangeLogRepository changeLogRepository;
 
 	@Override
 	public void crawl(String url) {
@@ -52,18 +55,42 @@ public class GroupsCrawler implements Crawler<Group> {
 			Document doc = Jsoup.connect(url).get();
 			Collection<String> groupLinks = extractGroupLinksElements(doc);
 
+			ChangeLog changeLog = new ChangeLog();
+
 			Group currentGroup;
 			for (String link : groupLinks) {
 				doc = Jsoup.connect(link).get();
 				String groupName = extractName(doc);
-				log.info("[GROUP] getting \"" + groupName + "\"");
-				currentGroup = new Group(extractId(doc), groupName, extractDescription(doc), extractGroupAliases(doc),
-						getGroupTechniques(doc), getGroupSoftwares(doc));
-				groupsRepository.saveAndFlush(currentGroup);
+				if (groupName.equals("admin@338")) {
+					log.info("[GROUP] getting \"" + groupName + "\"");
+					currentGroup = new Group(extractId(doc), groupName, extractDescription(doc),
+							extractGroupAliases(doc), getGroupTechniques(doc, changeLog),
+							getGroupSoftwares(doc, changeLog));
+					saveOrUpdate(currentGroup, currentGroup.getId(), groupsRepository, changeLog);
+				}
 			}
+
+			changeLogRepository.save(changeLog);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private <E, ID> void saveOrUpdate(E entity, ID id, JpaRepository<E, ID> repository, ChangeLog changeLog) {
+		if (repository.existsById(id)) {
+			E oldEntity = repository.findById(id).get();
+			E newEntity = repository.saveAndFlush(entity);
+			if (!oldEntity.equals(newEntity)) {
+				changeLog.addChange(newEntity);
+			}
+		} else {
+			changeLog.addChange(repository.saveAndFlush(entity));
+		}
+		/*
+		 * if (!entity.equals(repository.findById(id).get())) {
+		 * changeLog.addChange(repository.saveAndFlush(entity)); }
+		 */
 	}
 
 	private Collection<String> extractGroupLinksElements(Document doc) {
@@ -99,25 +126,14 @@ public class GroupsCrawler implements Crawler<Group> {
 				.asList(details.get(TACTIC_INDEX).text().substring(TACTIC_PREFIX_CHAR_COUNT).split(TACTICS_SEPERATOR)));
 	}
 
-	private Set<Software> getGroupSoftwares(Document doc) {
-		Set<Software> softwares = new HashSet<>();
-		for (String techniqueLink : extractGroupSoftwaresLinks(doc)) {
-			softwares.add(getSoftwareFromLink(techniqueLink));
-		}
-
-		softwares.stream().filter(software -> software != null)
-				.forEach(software -> softwaresRepository.saveAndFlush(software));
-		return softwares;
-	}
-
-	private Set<Technique> getGroupTechniques(Document doc) {
+	private Set<Technique> getGroupTechniques(Document doc, ChangeLog changeLog) {
 		Set<Technique> techniques = new HashSet<>();
 		for (String techniqueLink : extractGroupTechniquesLinks(doc)) {
 			techniques.add(getTechniqueFromLink(techniqueLink));
 		}
 
 		techniques.stream().filter(technique -> technique != null)
-				.forEach(technique -> techniquesRepository.saveAndFlush(technique));
+				.forEach(technique -> saveOrUpdate(technique, technique.getId(), techniquesRepository, changeLog));
 		return techniques;
 	}
 
@@ -151,6 +167,17 @@ public class GroupsCrawler implements Crawler<Group> {
 		}
 
 		return technique;
+	}
+
+	private Set<Software> getGroupSoftwares(Document doc, ChangeLog changeLog) {
+		Set<Software> softwares = new HashSet<>();
+		for (String softwareLink : extractGroupSoftwaresLinks(doc)) {
+			softwares.add(getSoftwareFromLink(softwareLink));
+		}
+
+		softwares.stream().filter(software -> software != null)
+				.forEach(software -> saveOrUpdate(software, software.getId(), softwaresRepository, changeLog));
+		return softwares;
 	}
 
 	private Collection<String> extractGroupSoftwaresLinks(Document doc) {
