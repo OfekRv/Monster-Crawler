@@ -1,4 +1,4 @@
-package mitreCrawler.bl;
+package mitreCrawler.bl.crawlers.groups;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import mitreCrawler.repositories.TechniqueRepository;
 
 @Named
 @Slf4j
-public class GroupsCrawler implements Crawler<Group> {
+public class AttackGroupsCrawler implements GroupsCrawler {
 	private static final int ID_INDEX = 0;
 	private static final int TACTIC_INDEX = 1;
 	private static final int SOFTWARE_INDEX = 1;
@@ -39,6 +39,8 @@ public class GroupsCrawler implements Crawler<Group> {
 	private static final int TACTIC_PREFIX_CHAR_COUNT = 8;
 
 	private static final String TACTICS_SEPERATOR = ",";
+
+	private String groupsUrl = "https://attack.mitre.org/groups/";
 
 	@Inject
 	private GroupRepository groupsRepository;
@@ -50,9 +52,9 @@ public class GroupsCrawler implements Crawler<Group> {
 	private ChangeLogRepository changeLogRepository;
 
 	@Override
-	public void crawl(String url) {
+	public void crawl() {
 		try {
-			Document doc = Jsoup.connect(url).get();
+			Document doc = Jsoup.connect(groupsUrl).get();
 			Collection<String> groupLinks = extractGroupLinksElements(doc);
 
 			ChangeLog changeLog = new ChangeLog();

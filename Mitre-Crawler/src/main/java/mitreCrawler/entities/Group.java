@@ -47,6 +47,9 @@ public class Group {
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "atk_softwares_in_groups", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "software_id"))
 	private Set<Software> softwares;
+	/*@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "atk_groups_in_articles", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "article_id"))
+	private Set<Article> articles;*/
 
 	@Override
 	public boolean equals(Object o) {
