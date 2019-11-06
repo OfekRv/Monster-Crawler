@@ -22,10 +22,10 @@ import mitreCrawler.repositories.ArticleRepository;
 
 @Named
 @Slf4j
-public class InformationSecurityMagazineArticleCrawler implements ArticlesCrawler<Group> {
-	private static final String SEARCH = "search/q=";
+public class ThreatPostArticleCrawler implements ArticlesCrawler<Group> {
+	private static final String SEARCH = "?s=";
 
-	private String infoSecurityMagazineUrl = "https://www.infosecurity-magazine.com/search/?q=apt";
+	private String infoSecurityMagazineUrl = "https://threatpost.com/";
 
 	@Inject
 	private ArticleRepository articlesRepository;
@@ -35,14 +35,17 @@ public class InformationSecurityMagazineArticleCrawler implements ArticlesCrawle
 
 		try {
 			Document doc = Jsoup.connect(infoSecurityMagazineUrl + SEARCH + '"' + entityToCrawl.getName() + '"').get();
-			Elements articlesLinks = doc.getElementsByClass("gs-webResult gs-result");
+			Elements articlesLinks = extractArticlesLinks(doc);
 			for (Element article : articlesLinks) {
 				String articleUrl = article.select("a").first().absUrl("href");
 				if (!articlesRepository.existsByUrl(articleUrl)) {
 					log.info("[ARTICLE] getting \"" + articleUrl + "\"");
-					articlesRepository
-							.save(new Article(articleUrl, extractTitle(article), getArticleContent(articleUrl),
-									extractArticleDate(article), new HashSet<Group>(Arrays.asList(entityToCrawl))));
+					String content = getArticleContent(articleUrl);
+					if (content.contains(paddedWithSpaces(entityToCrawl.getName()))) {
+						log.info("[ARTICLE] saving \"" + articleUrl + "\"");
+						articlesRepository.save(new Article(articleUrl, extractTitle(article), content,
+								extractArticleDate(article), new HashSet<Group>(Arrays.asList(entityToCrawl))));
+					}
 				}
 			}
 			/*
@@ -53,8 +56,17 @@ public class InformationSecurityMagazineArticleCrawler implements ArticlesCrawle
 		}
 	}
 
+	private Elements extractArticlesLinks(Document doc) {
+		Elements linksContainer = doc.getElementsByClass("c-border-layout");
+		if (!linksContainer.isEmpty()) {
+			return doc.getElementsByClass("c-border-layout").first().getElementsByClass("o-row");
+		}
+
+		return new Elements();
+	}
+
 	private String extractTitle(Element article) {
-		return article.getElementsByClass("gs-title").first().attr("title");
+		return article.getElementsByClass("c-card__title").first().text();
 	}
 
 	private String getArticleContent(String url) throws IOException {
@@ -62,9 +74,12 @@ public class InformationSecurityMagazineArticleCrawler implements ArticlesCrawle
 	}
 
 	private LocalDate extractArticleDate(Element article) {
-		return LocalDate.parse(
-				article.getElementsByClass("gs-bidi-start-align gs-snippet").first().text().split("...")[0],
-				DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US));
+		return LocalDate.parse(article.select("time").first().attr("datetime").split("T")[0],
+				DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US));
 
+	}
+
+	private String paddedWithSpaces(String text) {
+		return " " + text + "";
 	}
 }

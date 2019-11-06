@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import lombok.extern.slf4j.Slf4j;
 import mitreCrawler.bl.crawlers.articles.CywareArticlesCrawler;
+import mitreCrawler.bl.crawlers.articles.ThreatPostArticleCrawler;
 import mitreCrawler.bl.crawlers.groups.AttackGroupsCrawler;
 import mitreCrawler.entities.Group;
 import mitreCrawler.repositories.GroupRepository;
@@ -18,7 +19,7 @@ public class CrawlerSchedulator {
 	private AttackGroupsCrawler groupsCrawler;
 
 	@Inject
-	private CywareArticlesCrawler articlesCrawler;
+	private ThreatPostArticleCrawler articlesCrawler;
 
 	// for debug
 	@Inject

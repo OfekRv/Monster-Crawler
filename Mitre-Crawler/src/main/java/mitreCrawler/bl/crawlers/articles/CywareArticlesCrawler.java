@@ -39,9 +39,12 @@ public class CywareArticlesCrawler implements ArticlesCrawler<Group> {
 				String articleUrl = article.select("a").first().absUrl("href");
 				if (!articlesRepository.existsByUrl(articleUrl)) {
 					log.info("[ARTICLE] getting \"" + articleUrl + "\"");
-					articlesRepository
-							.save(new Article(articleUrl, extractTitle(article), getArticleContent(articleUrl),
-									extractArticleDate(article), new HashSet<Group>(Arrays.asList(entityToCrawl))));
+					String content = getArticleContent(articleUrl);
+					if (content.contains(paddedWithSpaces(entityToCrawl.getName()))) {
+						log.info("[ARTICLE] saving \"" + articleUrl + "\"");
+						articlesRepository.save(new Article(articleUrl, extractTitle(article), content,
+								extractArticleDate(article), new HashSet<Group>(Arrays.asList(entityToCrawl))));
+					}
 				}
 			}
 			/*
@@ -64,5 +67,9 @@ public class CywareArticlesCrawler implements ArticlesCrawler<Group> {
 		return LocalDate.parse(article.getElementsByClass("date").first().text(),
 				DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.US));
 
+	}
+
+	private String paddedWithSpaces(String text) {
+		return " " + text + "";
 	}
 }
