@@ -24,7 +24,7 @@ import mitreCrawler.repositories.ArticleRepository;
 public class CywareArticlesCrawler implements ArticlesCrawler<Group> {
 	private static final String SEARCH = "search/";
 
-	@Value("${THREAT_POST_URL}")
+	@Value("${CYWARE_URL}")
 	private String cywareUrl;
 
 	@Inject
