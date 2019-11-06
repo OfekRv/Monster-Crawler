@@ -36,6 +36,12 @@ public class CywareArticlesCrawler implements ArticlesCrawler<Group> {
 	}
 
 	@Override
+	public Elements loadAndExtractNextArticles(Group entity) {
+		// TODO
+		return new Elements();
+	}
+
+	@Override
 	public String extractTitle(Element article) {
 		return article.select("img").first().attr("title");
 	}

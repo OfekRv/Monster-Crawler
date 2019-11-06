@@ -39,9 +39,6 @@ public class CrawlerSchedulator {
 			log.info("[GROUP] " + group.getName());
 			for (ArticlesCrawler<Group> articlesCrawler : articlesCrawlers) {
 				articlesCrawler.crawl(group);
-
-				log.info("[GROUP] " + group.getName());
-
 			}
 		}
 

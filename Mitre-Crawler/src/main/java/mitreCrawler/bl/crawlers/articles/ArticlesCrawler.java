@@ -16,31 +16,13 @@ import mitreCrawler.entities.Article;
 import mitreCrawler.repositories.ArticleRepository;
 
 public interface ArticlesCrawler<E> {
-
 	public default void crawl(E entityToCrawl) {
 		try {
 			Document doc = Jsoup.connect(buildUrl(entityToCrawl)).get();
 			Elements articlesElements = extractArticlesElements(doc);
+			articlesElements.addAll(loadAndExtractNextArticles(entityToCrawl));
 			for (Element articleElement : articlesElements) {
-				String articleUrl = extractUrl(articleElement);
-				getLogger().info("[ARTICLE] getting \"" + articleUrl + "\"");
-				String content = getArticleContent(articleUrl);
-				if (content.contains(paddedWithSpaces(getEntityName(entityToCrawl)))) {
-					Article article;
-					if (getRepository().existsByUrl(articleUrl)) {
-						article = getRepository().findByUrl(articleUrl);
-						if (!article.isRelatedEntity(entityToCrawl)) {
-							getLogger().info("[ARTICLE] found another related entity in \"" + articleUrl + "\"");
-							relateEntityAndSave(entityToCrawl, article);
-						}
-					} else {
-						getLogger().info("[ARTICLE] saving \"" + articleUrl + "\"");
-						article = new Article(articleUrl, extractTitle(articleElement), content,
-								extractArticleDate(articleElement));
-						relateEntityAndSave(entityToCrawl, article);
-					}
-
-				}
+				CrawelArticle(entityToCrawl, articleElement);
 			}
 			/*
 			 * there is a post command which loads more
@@ -50,12 +32,36 @@ public interface ArticlesCrawler<E> {
 		}
 	}
 
+	public default void CrawelArticle(E entityToCrawl, Element articleElement) throws IOException {
+		String articleUrl = extractUrl(articleElement);
+		getLogger().info("[ARTICLE] getting \"" + articleUrl + "\"");
+		String content = getArticleContent(articleUrl);
+		if (content.contains(paddedWithSpaces(getEntityName(entityToCrawl)))) {
+			Article article;
+			if (getRepository().existsByUrl(articleUrl)) {
+				article = getRepository().findByUrl(articleUrl);
+				if (!article.isRelatedEntity(entityToCrawl)) {
+					getLogger().info("[ARTICLE] found another related entity in \"" + articleUrl + "\"");
+					relateEntityAndSave(entityToCrawl, article);
+				}
+			} else {
+				getLogger().info("[ARTICLE] saving \"" + articleUrl + "\"");
+				article = new Article(articleUrl, extractTitle(articleElement), content,
+						extractArticleDate(articleElement));
+				relateEntityAndSave(entityToCrawl, article);
+			}
+
+		}
+	}
+
 	public default void relateEntityAndSave(E entityToCrawl, Article article) {
 		article.addRelatedEntity(entityToCrawl);
 		getRepository().saveAndFlush(article);
 	}
 
 	public Elements extractArticlesElements(Document doc);
+
+	public Elements loadAndExtractNextArticles(E entity) throws IOException;
 
 	public String buildUrl(E entity);
 

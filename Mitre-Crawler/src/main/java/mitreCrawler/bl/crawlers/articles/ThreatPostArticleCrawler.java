@@ -1,6 +1,7 @@
 package mitreCrawler.bl.crawlers.articles;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -23,6 +24,7 @@ import mitreCrawler.repositories.ArticleRepository;
 @Slf4j
 public class ThreatPostArticleCrawler implements ArticlesCrawler<Group> {
 	private static final String SEARCH = "?s=";
+	private static final String API_URL = "wp-admin/admin-ajax.php";
 
 	@Value("${THREAT_POST_URL}")
 	private String ThreatPostUrl;
@@ -32,12 +34,23 @@ public class ThreatPostArticleCrawler implements ArticlesCrawler<Group> {
 
 	@Override
 	public Elements extractArticlesElements(Document doc) {
-		Elements linksContainer = doc.getElementsByClass("c-border-layout");
-		if (!linksContainer.isEmpty()) {
-			return doc.getElementsByClass("c-border-layout").first().getElementsByClass("o-row");
-		}
+		return doc.select("article");
+	}
 
-		return new Elements();
+	@Override
+	public Elements loadAndExtractNextArticles(Group entity) throws IOException {
+		int currentPage = 1;
+		Elements articlesElements = new Elements();
+		Document doc;
+		do {
+			doc = Jsoup.connect(ThreatPostUrl + API_URL).data("action", "loadmore")
+					.data("query", URLEncoder.encode("{\"s\":\"" + entity.getName() + "\",\"order\":\"DESC\"}"))
+					.data("page", Integer.toString(currentPage++)).post();
+
+			articlesElements.addAll(extractArticlesElements(doc));
+		} while (doc.hasText());
+
+		return articlesElements;
 	}
 
 	@Override
