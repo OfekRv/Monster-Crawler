@@ -1,6 +1,7 @@
 package mitreCrawler.entities;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -50,12 +51,18 @@ public class Article {
 	@JoinTable(name = "atk_groups_in_articles", joinColumns = @JoinColumn(name = "article_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
 	private Set<Group> groups;
 
-	public Article(String url, String title, String content, LocalDate date, Set<Group> groups) {
+	public Article(String url, String title, String content, LocalDate date) {
 		super();
 		this.url = url;
 		this.title = title;
 		this.content = content;
 		this.date = date;
-		this.groups = groups;
+		this.groups = new HashSet<Group>();
+	}
+
+	public <E> void addRelatedEntity(E Entity) {
+		if (Entity.getClass().equals(Group.class)) {
+			groups.add((Group) Entity);
+		}
 	}
 }
