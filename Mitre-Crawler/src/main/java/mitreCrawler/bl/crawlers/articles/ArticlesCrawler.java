@@ -16,22 +16,30 @@ import mitreCrawler.entities.Article;
 import mitreCrawler.repositories.ArticleRepository;
 
 public interface ArticlesCrawler<E> {
+
 	public default void crawl(E entityToCrawl) {
 		try {
 			Document doc = Jsoup.connect(buildUrl(entityToCrawl)).get();
 			Elements articlesElements = extractArticlesElements(doc);
 			for (Element articleElement : articlesElements) {
 				String articleUrl = extractUrl(articleElement);
-				if (!getRepository().existsByUrl(articleUrl)) {
-					getLogger().info("[ARTICLE] getting \"" + articleUrl + "\"");
-					String content = getArticleContent(articleUrl);
-					if (content.contains(paddedWithSpaces(getEntityName(entityToCrawl)))) {
+				getLogger().info("[ARTICLE] getting \"" + articleUrl + "\"");
+				String content = getArticleContent(articleUrl);
+				if (content.contains(paddedWithSpaces(getEntityName(entityToCrawl)))) {
+					Article article;
+					if (getRepository().existsByUrl(articleUrl)) {
+						article = getRepository().findByUrl(articleUrl);
+						if (article.isRelatedEntity(entityToCrawl)) {
+							getLogger().info("[ARTICLE] found another related entity in \"" + articleUrl + "\"");
+						}
+					} else {
 						getLogger().info("[ARTICLE] saving \"" + articleUrl + "\"");
-						Article article = new Article(articleUrl, extractTitle(articleElement), content,
+						article = new Article(articleUrl, extractTitle(articleElement), content,
 								extractArticleDate(articleElement));
-						article.addRelatedEntity(entityToCrawl);
-						getRepository().save(article);
+
 					}
+					article.addRelatedEntity(entityToCrawl);
+					getRepository().saveAndFlush(article);
 				}
 			}
 			/*

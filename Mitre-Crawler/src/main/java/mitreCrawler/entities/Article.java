@@ -65,4 +65,12 @@ public class Article {
 			groups.add((Group) Entity);
 		}
 	}
+
+	public <E> boolean isRelatedEntity(E Entity) {
+		if (Entity.getClass().equals(Group.class)) {
+			return groups.contains((Group) Entity);
+		}
+
+		return false;
+	}
 }

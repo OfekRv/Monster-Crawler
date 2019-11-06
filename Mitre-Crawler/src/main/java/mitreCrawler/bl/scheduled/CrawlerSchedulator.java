@@ -6,7 +6,6 @@ import javax.inject.Named;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import lombok.extern.slf4j.Slf4j;
-import mitreCrawler.bl.crawlers.articles.CywareArticlesCrawler;
 import mitreCrawler.bl.crawlers.articles.ThreatPostArticleCrawler;
 import mitreCrawler.bl.crawlers.groups.AttackGroupsCrawler;
 import mitreCrawler.entities.Group;
