@@ -3,6 +3,7 @@ package mitreCrawler.entities;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -68,7 +69,7 @@ public class Article {
 
 	public <E> boolean isRelatedEntity(E Entity) {
 		if (Entity.getClass().equals(Group.class)) {
-			return groups.contains((Group) Entity);
+			return groups.stream().map(Group::getId).collect(Collectors.toList()).contains(((Group) Entity).getId());
 		}
 
 		return false;

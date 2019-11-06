@@ -29,17 +29,17 @@ public interface ArticlesCrawler<E> {
 					Article article;
 					if (getRepository().existsByUrl(articleUrl)) {
 						article = getRepository().findByUrl(articleUrl);
-						if (article.isRelatedEntity(entityToCrawl)) {
+						if (!article.isRelatedEntity(entityToCrawl)) {
 							getLogger().info("[ARTICLE] found another related entity in \"" + articleUrl + "\"");
+							relateEntityAndSave(entityToCrawl, article);
 						}
 					} else {
 						getLogger().info("[ARTICLE] saving \"" + articleUrl + "\"");
 						article = new Article(articleUrl, extractTitle(articleElement), content,
 								extractArticleDate(articleElement));
-
+						relateEntityAndSave(entityToCrawl, article);
 					}
-					article.addRelatedEntity(entityToCrawl);
-					getRepository().saveAndFlush(article);
+
 				}
 			}
 			/*
@@ -48,6 +48,11 @@ public interface ArticlesCrawler<E> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public default void relateEntityAndSave(E entityToCrawl, Article article) {
+		article.addRelatedEntity(entityToCrawl);
+		getRepository().saveAndFlush(article);
 	}
 
 	public Elements extractArticlesElements(Document doc);
