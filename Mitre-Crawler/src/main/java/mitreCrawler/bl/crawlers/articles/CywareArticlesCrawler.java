@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import mitreCrawler.entities.Group;
 import mitreCrawler.repositories.ArticleRepository;
 
-@Named
+//@Named
 @Slf4j
 public class CywareArticlesCrawler implements ArticlesCrawler<Group> {
 	private static final String SEARCH = "search/";

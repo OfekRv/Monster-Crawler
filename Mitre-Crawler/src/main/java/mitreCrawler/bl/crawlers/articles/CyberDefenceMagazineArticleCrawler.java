@@ -6,8 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -18,10 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import mitreCrawler.entities.Group;
 import mitreCrawler.repositories.ArticleRepository;
 
-@Named
+// Not very stable source
+
+//@Named
 @Slf4j
 public class CyberDefenceMagazineArticleCrawler implements ArticlesCrawler<Group> {
-	private static final String SEARCH = "?s=";
+	private static final String SEARCH_QUERY = "?s=";
+	private static final String PAGE = "page/";
 
 	@Value("${CYBER_DEFENCE_MAGAZINE_URL}")
 	private String cyberDefenceMagazineUrl;
@@ -31,13 +34,25 @@ public class CyberDefenceMagazineArticleCrawler implements ArticlesCrawler<Group
 
 	@Override
 	public Elements extractArticlesElements(Document doc) {
-		return doc.getElementsByClass("item-details");
+		return doc.getElementsByClass("td_module_16 td_module_wrap td-animation-stack");
 	}
 
 	@Override
 	public Elements loadAndExtractNextArticles(Group entity) throws IOException {
-		// TODO: stub
-		return new Elements();
+		int currentPage = 2;
+		Elements articlesElements = new Elements();
+		Elements currentArticlesElements;
+		Document doc;
+		do {
+			doc = Jsoup.connect(cyberDefenceMagazineUrl + PAGE + currentPage++ + "/" + SEARCH_QUERY + '"'
+					+ entity.getName().replace(" ", "%20") + '"').ignoreHttpErrors(true).get();
+
+			currentArticlesElements = extractArticlesElements(doc);
+			articlesElements.addAll(currentArticlesElements);
+
+		} while (!currentArticlesElements.isEmpty());
+
+		return articlesElements;
 	}
 
 	@Override
@@ -54,7 +69,7 @@ public class CyberDefenceMagazineArticleCrawler implements ArticlesCrawler<Group
 
 	@Override
 	public String buildUrl(Group entity) {
-		return cyberDefenceMagazineUrl + SEARCH + '"' + entity.getName().replace(" ", "%20") + '"';
+		return cyberDefenceMagazineUrl + SEARCH_QUERY + '"' + entity.getName().replace(" ", "%20") + '"';
 	}
 
 	@Override
