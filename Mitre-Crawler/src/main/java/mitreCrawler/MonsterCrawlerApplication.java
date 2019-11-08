@@ -6,8 +6,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class MitreCrawlerApplication {
+public class MonsterCrawlerApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(MitreCrawlerApplication.class, args);
+		SpringApplication.run(MonsterCrawlerApplication.class, args);
 	}
 }

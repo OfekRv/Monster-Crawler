@@ -59,11 +59,6 @@ public class ThreatPostArticleCrawler implements ArticlesCrawler<Group> {
 	}
 
 	@Override
-	public String getArticleContent(String url) throws IOException {
-		return Jsoup.connect(url).get().text();
-	}
-
-	@Override
 	public LocalDate extractArticleDate(Element article) {
 		return LocalDate.parse(article.select("time").first().attr("datetime").split("T")[0],
 				DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US));

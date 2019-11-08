@@ -59,6 +59,10 @@ public interface ArticlesCrawler<E> {
 		getRepository().saveAndFlush(article);
 	}
 
+	public default String getArticleContent(String url) throws IOException {
+		return Jsoup.connect(url).get().html();
+	}
+
 	public Elements extractArticlesElements(Document doc);
 
 	public Elements loadAndExtractNextArticles(E entity) throws IOException;
@@ -66,8 +70,6 @@ public interface ArticlesCrawler<E> {
 	public String buildUrl(E entity);
 
 	public String extractTitle(Element article);
-
-	public String getArticleContent(String url) throws IOException;
 
 	public LocalDate extractArticleDate(Element article);
 

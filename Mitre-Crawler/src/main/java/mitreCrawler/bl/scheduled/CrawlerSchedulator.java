@@ -20,8 +20,6 @@ public class CrawlerSchedulator {
 	private AttackGroupsCrawler groupsCrawler;
 	@Inject
 	private Collection<ArticlesCrawler<Group>> articlesCrawlers;
-
-	// for debug
 	@Inject
 	private GroupRepository groupRepository;
 
@@ -34,7 +32,7 @@ public class CrawlerSchedulator {
 
 	@Scheduled(cron = "${cron.expression}")
 	public void executeArticlesCrawler() {
-		log.info("started executing groups crawler");
+		log.info("started executing atricles crawler");
 		for (Group group : groupRepository.findAll()) {
 			log.info("[GROUP] " + group.getName());
 			for (ArticlesCrawler<Group> articlesCrawler : articlesCrawlers) {

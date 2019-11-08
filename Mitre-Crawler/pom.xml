@@ -13,9 +13,9 @@
 	</parent>
 
 	<groupId>Rvn</groupId>
-	<artifactId>Mitre-Crawler</artifactId>
-	<version>0.0.1</version>
-	<name>Mitre-Crawler</name>
+	<artifactId>Monster-Crawler</artifactId>
+	<version>0.0.3</version>
+	<name>Monster-Crawler</name>
 
 	<dependencies>
 		<dependency>

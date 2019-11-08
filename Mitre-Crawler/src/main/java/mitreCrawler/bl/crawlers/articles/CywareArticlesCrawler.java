@@ -46,10 +46,6 @@ public class CywareArticlesCrawler implements ArticlesCrawler<Group> {
 		return article.select("img").first().attr("title");
 	}
 
-	@Override
-	public String getArticleContent(String url) throws IOException {
-		return Jsoup.connect(url).get().text();
-	}
 
 	@Override
 	public LocalDate extractArticleDate(Element article) {
