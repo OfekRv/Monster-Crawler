@@ -13,7 +13,7 @@ public class CrawelersUtils {
 	}
 
 	public static Document getRequestIgnoringBadStatusCode(String url) throws IOException {
-		return Jsoup.connect(url).get();
+		return Jsoup.connect(url).ignoreHttpErrors(true).get();
 	}
 
 	public static Element getFirstElementByClass(Element e, String className) {

@@ -13,7 +13,7 @@ import monsterCrawler.entities.Group;
 
 // Not very stable source
 
-//@Named
+@Named
 public class CyberDefenceMagazineArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private static final String SEARCH_QUERY = "?s=";
 	private static final String PAGE = "page/";
@@ -28,7 +28,7 @@ public class CyberDefenceMagazineArticleCrawler extends AbstractArticlesCrawler<
 
 	@Override
 	public String buildSearchUrl(Group entity, int currentPage) {
-		return cyberDefenceMagazineUrl + PAGE + currentPage++ + "/" + SEARCH_QUERY + '"'
+		return cyberDefenceMagazineUrl + PAGE + currentPage + "/" + SEARCH_QUERY + '"'
 				+ entity.getName().replace(" ", "%20") + '"';
 	}
 

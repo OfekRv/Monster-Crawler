@@ -73,7 +73,8 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		Elements currentArticlesElements;
 		Document doc;
 		do {
-			doc = getRequestIgnoringBadStatusCode(buildSearchUrl(entity, currentPage));
+			String url = buildSearchUrl(entity, currentPage);
+			doc = getRequestIgnoringBadStatusCode(buildSearchUrl(entity, currentPage++));
 
 			currentArticlesElements = extractArticlesElements(doc);
 			articlesElements.addAll(currentArticlesElements);

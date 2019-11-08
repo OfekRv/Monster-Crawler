@@ -38,8 +38,8 @@ public class CrawlerSchedulator {
 			for (ArticlesCrawler<Group> articlesCrawler : articlesCrawlers) {
 				articlesCrawler.crawl(group);
 			}
-		}
 
+		}
 		log.info("finished executing groups crawler");
 	}
 }

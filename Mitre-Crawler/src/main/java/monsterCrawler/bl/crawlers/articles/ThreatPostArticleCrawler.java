@@ -25,7 +25,7 @@ public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public String buildUrl(Group entity) {
-		return ThreatPostUrl + SEARCH + '"' + entity.getName().replace(" ", "%20") + '"';
+		return ThreatPostUrl + SEARCH + '"' + encodeUrl(entity.getName()) + '"';
 	}
 
 	@Override

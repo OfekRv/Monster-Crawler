@@ -27,7 +27,7 @@ public class ZdnetArticleCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public String buildSearchUrl(Group entity, int currentPage) {
-		return zdnetUrl + SEARCH + "/" + (currentPage++) + "/" + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
+		return zdnetUrl + SEARCH + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
 	}
 
 	@Override
