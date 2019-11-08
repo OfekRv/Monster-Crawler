@@ -61,7 +61,7 @@ public interface ArticlesCrawler<E> {
 
 	public default String getArticleContent(String url) throws IOException {
 		Document doc = Jsoup.connect(url).get();
-		doc.select("script,link,footer,img,image,iframe,.hidden,style,meta,form").remove();
+		doc.select("script,link,footer,img,image,iframe,.hidden,style,path,meta,form").remove();
 		return doc.html();
 	}
 

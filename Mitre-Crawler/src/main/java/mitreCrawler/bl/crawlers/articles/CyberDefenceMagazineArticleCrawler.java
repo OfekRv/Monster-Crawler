@@ -20,18 +20,18 @@ import mitreCrawler.repositories.ArticleRepository;
 
 @Named
 @Slf4j
-public class ZdnetArticleCrawler implements ArticlesCrawler<Group> {
-	private static final String SEARCH = "search/?o=1&q=";
+public class CyberDefenceMagazineArticleCrawler implements ArticlesCrawler<Group> {
+	private static final String SEARCH = "?s=";
 
-	@Value("${ZDNET_URL}")
-	private String zdnetUrl;
+	@Value("${CYBER_DEFENCE_MAGAZINE_URL}")
+	private String cyberDefenceMagazineUrl;
 
 	@Inject
 	private ArticleRepository articlesRepository;
 
 	@Override
 	public Elements extractArticlesElements(Document doc) {
-		return doc.select("article");
+		return doc.getElementsByClass("item-details");
 	}
 
 	@Override
@@ -47,14 +47,14 @@ public class ZdnetArticleCrawler implements ArticlesCrawler<Group> {
 
 	@Override
 	public LocalDate extractArticleDate(Element article) {
-		return LocalDate.parse(article.getElementsByClass("meta").first().select("span").first().text(),
+		return LocalDate.parse(article.select("time").first().text(),
 				DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.US));
 
 	}
 
 	@Override
 	public String buildUrl(Group entity) {
-		return zdnetUrl + SEARCH + '"' + entity.getName().replace(" ", "%20") + '"';
+		return cyberDefenceMagazineUrl + SEARCH + '"' + entity.getName().replace(" ", "%20") + '"';
 	}
 
 	@Override
