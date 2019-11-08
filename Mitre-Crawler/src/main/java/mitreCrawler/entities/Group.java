@@ -27,14 +27,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Group {
+public class Group implements NamedEntity {
 	@Id
 	@JoinColumn(name = "group_id")
 	private String id;
 	@Column(nullable = false, unique = true)
 	private String name;
-	// @Column(nullable = false, unique = false)
-	// private String contentVersion;
 	@Column(length = 50000, nullable = true, unique = false)
 	private String description;
 	@ElementCollection(fetch = FetchType.EAGER)
@@ -47,9 +45,13 @@ public class Group {
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "atk_softwares_in_groups", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "software_id"))
 	private Set<Software> softwares;
-	/*@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "atk_groups_in_articles", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "article_id"))
-	private Set<Article> articles;*/
+	/*
+	 * @ManyToMany(fetch = FetchType.EAGER)
+	 * 
+	 * @JoinTable(name = "atk_groups_in_articles", joinColumns
+	 * = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name =
+	 * "article_id")) private Set<Article> articles;
+	 */
 
 	@Override
 	public boolean equals(Object o) {

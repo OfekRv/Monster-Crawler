@@ -20,16 +20,12 @@ import lombok.Setter;
 @EqualsAndHashCode
 @Getter
 @Setter
-public class Software {
+public class Software implements NamedEntity{
 	@Id
 	@JoinColumn(name = "software_id")
 	private String id;
 	@Column(nullable = false, unique = false)
 	private String name;
-	// @Column(nullable = false, unique = false)
-	// private String contentVersion;
 	@Column(length = 50000, nullable = true, unique = false)
 	private String description;
 }
-
-// tech used, platform, type

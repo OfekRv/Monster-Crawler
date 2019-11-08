@@ -5,6 +5,8 @@ import static utils.CrawelersUtils.paddedWithSpaces;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,9 +15,10 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 
 import mitreCrawler.entities.Article;
+import mitreCrawler.entities.NamedEntity;
 import mitreCrawler.repositories.ArticleRepository;
 
-public interface ArticlesCrawler<E> {
+public interface ArticlesCrawler<E extends NamedEntity> {
 	public default void crawl(E entityToCrawl) {
 		try {
 			Document doc = Jsoup.connect(buildUrl(entityToCrawl)).get();
@@ -24,9 +27,6 @@ public interface ArticlesCrawler<E> {
 			for (Element articleElement : articlesElements) {
 				CrawelArticle(entityToCrawl, articleElement);
 			}
-			/*
-			 * there is a post command which loads more
-			 */
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -36,7 +36,7 @@ public interface ArticlesCrawler<E> {
 		String articleUrl = extractUrl(articleElement);
 		getLogger().info("[ARTICLE] getting \"" + articleUrl + "\"");
 		String content = getArticleContent(articleUrl);
-		if (content.contains(paddedWithSpaces(getEntityName(entityToCrawl)))) {
+		if (content.contains(paddedWithSpaces(entityToCrawl.getName()))) {
 			Article article;
 			if (getRepository().existsByUrl(articleUrl)) {
 				article = getRepository().findByUrl(articleUrl);
@@ -47,7 +47,7 @@ public interface ArticlesCrawler<E> {
 			} else {
 				getLogger().info("[ARTICLE] saving \"" + articleUrl + "\"");
 				article = new Article(articleUrl, extractTitle(articleElement), content,
-						extractArticleDate(articleElement));
+						parseArticleDate(articleElement));
 				relateEntityAndSave(entityToCrawl, article);
 			}
 
@@ -65,17 +65,40 @@ public interface ArticlesCrawler<E> {
 		return doc.html();
 	}
 
-	public Elements extractArticlesElements(Document doc);
+	public default Elements loadAndExtractNextArticles(E entity) throws IOException {
+		int currentPage = getFirstSearchPageIndex();
+		Elements articlesElements = new Elements();
+		Elements currentArticlesElements;
+		Document doc;
+		do {
+			doc = Jsoup.connect(buildSearchUrl(entity, currentPage)).ignoreHttpErrors(true).get();
 
-	public Elements loadAndExtractNextArticles(E entity) throws IOException;
+			currentArticlesElements = extractArticlesElements(doc);
+			articlesElements.addAll(currentArticlesElements);
+
+		} while (!currentArticlesElements.isEmpty());
+
+		return articlesElements;
+	}
+
+	public default LocalDate parseArticleDate(Element article) {
+		return LocalDate.parse(extractArticleDate(article),
+				DateTimeFormatter.ofPattern(getDateFormatPattern(), Locale.US));
+	}
 
 	public String buildUrl(E entity);
 
+	public String buildSearchUrl(E entity, int currentPage);
+
 	public String extractTitle(Element article);
 
-	public LocalDate extractArticleDate(Element article);
+	public Elements extractArticlesElements(Document doc);
 
-	public String getEntityName(E entity);
+	public String extractArticleDate(Element article);
+
+	public String getDateFormatPattern();
+
+	public int getFirstSearchPageIndex();
 
 	public ArticleRepository getRepository();
 

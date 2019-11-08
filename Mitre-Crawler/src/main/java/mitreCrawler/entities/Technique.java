@@ -23,14 +23,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Technique {
+public class Technique implements NamedEntity {
 	@Id
 	@JoinColumn(name = "techniques_id")
 	private String id;
 	@Column(nullable = false, unique = false)
 	private String name;
-	// @Column(nullable = false, unique = false)
-	// private String contentVersion;
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Column(nullable = true, unique = false)
 	private Collection<String> tactic;
