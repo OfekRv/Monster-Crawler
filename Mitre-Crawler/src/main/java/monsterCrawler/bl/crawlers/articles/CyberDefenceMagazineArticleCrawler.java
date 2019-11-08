@@ -28,8 +28,8 @@ public class CyberDefenceMagazineArticleCrawler extends AbstractArticlesCrawler<
 
 	@Override
 	public String buildSearchUrl(Group entity, int currentPage) {
-		return cyberDefenceMagazineUrl + PAGE + currentPage + "/" + SEARCH_QUERY + '"'
-				+ entity.getName().replace(" ", "%20") + '"';
+		return cyberDefenceMagazineUrl + PAGE + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(entity.getName())
+				+ '"';
 	}
 
 	@Override

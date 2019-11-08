@@ -1,5 +1,6 @@
 package monsterCrawler.bl.crawlers.articles;
 
+import static monsterCrawler.utils.CrawelersUtils.createConnection;
 import static monsterCrawler.utils.CrawelersUtils.encodeUrl;
 import static monsterCrawler.utils.CrawelersUtils.getFirstElementByClass;
 
@@ -7,7 +8,6 @@ import java.io.IOException;
 
 import javax.inject.Named;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -54,19 +54,10 @@ public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
 	}
 
 	@Override
-	public Elements loadAndExtractNextArticles(Group entity) throws IOException {
-		int currentPage = getFirstSearchPageIndex();
-		Elements articlesElements = new Elements();
-		Document doc;
-		do {
-			doc = Jsoup.connect(buildSearchUrl(entity, currentPage)).data("action", "loadmore")
-					.data("query", encodeUrl("{\"s\":\"" + entity.getName() + "\",\"order\":\"DESC\"}"))
-					.data("page", Integer.toString(currentPage++)).post();
-
-			articlesElements.addAll(extractArticlesElements(doc));
-		} while (doc.hasText());
-
-		return articlesElements;
+	public Document getSearchPage(Group entity, int pageIndex) throws IOException {
+		return createConnection(buildSearchUrl(entity, pageIndex)).data("action", "loadmore")
+				.data("query", encodeUrl("{\"s\":\"" + entity.getName() + "\",\"order\":\"DESC\"}"))
+				.data("page", Integer.toString(pageIndex)).post();
 	}
 
 	@Override

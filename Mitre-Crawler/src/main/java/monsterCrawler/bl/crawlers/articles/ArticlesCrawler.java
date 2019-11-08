@@ -1,5 +1,6 @@
 package monsterCrawler.bl.crawlers.articles;
 
+import static monsterCrawler.utils.CrawelersUtils.downloadAsCleanHtml;
 import static monsterCrawler.utils.CrawelersUtils.extractUrl;
 import static monsterCrawler.utils.CrawelersUtils.getRequest;
 import static monsterCrawler.utils.CrawelersUtils.getRequestIgnoringBadStatusCode;
@@ -10,7 +11,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -23,21 +23,23 @@ import monsterCrawler.repositories.ArticleRepository;
 public interface ArticlesCrawler<E extends NamedEntity> {
 	public default void crawl(E entityToCrawl) {
 		try {
-			Document doc = Jsoup.connect(buildUrl(entityToCrawl)).get();
+			Document doc = getRequest(buildUrl(entityToCrawl));
 			Elements articlesElements = extractArticlesElements(doc);
 			articlesElements.addAll(loadAndExtractNextArticles(entityToCrawl));
 			for (Element articleElement : articlesElements) {
-				CrawelArticle(entityToCrawl, articleElement);
+				CrawlArticle(entityToCrawl, articleElement);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			getLogger().warn("[ARTICLE] Session interrupted for crawler: " + this.getClass().getName()
+					+ " with entity: " + entityToCrawl.getName());
 		}
 	}
 
-	public default void CrawelArticle(E entityToCrawl, Element articleElement) throws IOException {
+	public default void CrawlArticle(E entityToCrawl, Element articleElement) {
 		String articleUrl = extractUrl(articleElement);
 		getLogger().info("[ARTICLE] getting \"" + articleUrl + "\"");
-		String content = getArticleContent(articleUrl);
+		String content = downloadAsCleanHtml(articleUrl);
+
 		if (content.contains(paddedWithSpaces(entityToCrawl.getName()))) {
 			Article article;
 			if (getRepository().existsByUrl(articleUrl)) {
@@ -61,27 +63,30 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		getRepository().saveAndFlush(article);
 	}
 
-	public default String getArticleContent(String url) throws IOException {
-		Document doc = getRequest(url);
-		doc.select("script,link,footer,img,image,iframe,.hidden,style,path,meta,form").remove();
-		return doc.html();
-	}
-
-	public default Elements loadAndExtractNextArticles(E entity) throws IOException {
+	public default Elements loadAndExtractNextArticles(E entity) {
 		int currentPage = getFirstSearchPageIndex();
 		Elements articlesElements = new Elements();
 		Elements currentArticlesElements;
 		Document doc;
 		do {
-			String url = buildSearchUrl(entity, currentPage);
-			doc = getRequestIgnoringBadStatusCode(buildSearchUrl(entity, currentPage++));
+			try {
+				doc = getSearchPage(entity, currentPage);
+			} catch (IOException e) {
+				getLogger().warn("[ARTICLE] Session interrupted for next articles page number \"" + currentPage + "\" ("
+						+ this.getClass().getName() + ")");
+				return articlesElements;
+			}
 
 			currentArticlesElements = extractArticlesElements(doc);
 			articlesElements.addAll(currentArticlesElements);
-
+			currentPage++;
 		} while (!currentArticlesElements.isEmpty());
 
 		return articlesElements;
+	}
+
+	public default Document getSearchPage(E entity, int pageIndex) throws IOException {
+		return getRequestIgnoringBadStatusCode(buildSearchUrl(entity, pageIndex));
 	}
 
 	public default LocalDate getArticleDate(Element article) {
