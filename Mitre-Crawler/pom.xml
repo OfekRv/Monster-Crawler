@@ -14,7 +14,7 @@
 
 	<groupId>Rvn</groupId>
 	<artifactId>Monster-Crawler</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<name>Monster-Crawler</name>
 
 	<dependencies>
