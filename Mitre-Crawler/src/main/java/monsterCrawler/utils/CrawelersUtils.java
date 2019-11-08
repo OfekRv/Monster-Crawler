@@ -3,6 +3,8 @@ package monsterCrawler.utils;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import javax.inject.Named;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,8 +13,11 @@ import org.jsoup.nodes.Element;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Named
 public class CrawelersUtils {
 	public static String EMPTY = "";
+
+	private static final String htmlTagsBlackList = "script,link,footer,img,image,iframe,.hidden,style,path,meta,form";
 
 	public static Document getRequest(String url) throws IOException {
 		return Jsoup.connect(url).get();
@@ -29,7 +34,7 @@ public class CrawelersUtils {
 	public static String downloadAsCleanHtml(String url) {
 		try {
 			Document doc = getRequest(url);
-			doc.select("script,link,footer,img,image,iframe,.hidden,style,path,meta,form").remove();
+			doc.select(htmlTagsBlackList).remove();
 			return doc.html();
 		} catch (IOException e) {
 			log.warn("[ARTICLE] Session interrupted while downloading \"" + url + "\"");
