@@ -1,5 +1,8 @@
 package mitreCrawler.bl.crawlers.articles;
 
+import static utils.CrawelersUtils.encodeUrl;
+import static utils.CrawelersUtils.getFirstElementByClass;
+
 import javax.inject.Named;
 
 import org.jsoup.nodes.Document;
@@ -19,18 +22,17 @@ public class ZdnetArticleCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public String buildUrl(Group entity) {
-		return zdnetUrl + SEARCH + SEARCH_QUERY + '"' + entity.getName().replace(" ", "%20") + '"';
+		return zdnetUrl + SEARCH + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
 	}
 
 	@Override
 	public String buildSearchUrl(Group entity, int currentPage) {
-		return zdnetUrl + SEARCH + "/" + (currentPage++) + "/" + SEARCH_QUERY + '"'
-				+ entity.getName().replace(" ", "%20") + '"';
+		return zdnetUrl + SEARCH + "/" + (currentPage++) + "/" + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
 	}
 
 	@Override
 	public String extractTitle(Element article) {
-		return article.select("h3").first().text();
+		return article.selectFirst("h3").text();
 	}
 
 	@Override
@@ -40,7 +42,7 @@ public class ZdnetArticleCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public String extractArticleDate(Element article) {
-		return article.getElementsByClass("meta").first().select("span").first().text();
+		return getFirstElementByClass(article, "meta").selectFirst("span").text();
 	}
 
 	@Override

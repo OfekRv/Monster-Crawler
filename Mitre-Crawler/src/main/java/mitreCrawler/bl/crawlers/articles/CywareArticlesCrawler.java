@@ -1,5 +1,7 @@
 package mitreCrawler.bl.crawlers.articles;
 
+import static utils.CrawelersUtils.getFirstElementByClass;
+
 import javax.inject.Named;
 
 import org.jsoup.nodes.Document;
@@ -41,7 +43,7 @@ public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public String extractTitle(Element article) {
-		return article.select("img").first().attr("title");
+		return article.selectFirst("img").attr("title");
 	}
 
 	@Override
@@ -51,7 +53,7 @@ public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public String extractArticleDate(Element article) {
-		return article.getElementsByClass("date").first().text();
+		return getFirstElementByClass(article, "date").text();
 	}
 
 	@Override

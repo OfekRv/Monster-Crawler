@@ -1,7 +1,9 @@
 package mitreCrawler.bl.crawlers.articles;
 
+import static utils.CrawelersUtils.encodeUrl;
+import static utils.CrawelersUtils.getFirstElementByClass;
+
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import javax.inject.Named;
 
@@ -38,12 +40,12 @@ public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public String extractTitle(Element article) {
-		return article.getElementsByClass("c-card__title").first().text();
+		return getFirstElementByClass(article, "c-card__title").text();
 	}
 
 	@Override
 	public String extractArticleDate(Element article) {
-		return article.select("time").first().attr("datetime").split("T")[0];
+		return getFirstElementByClass(article, "time").attr("datetime").split("T")[0];
 	}
 
 	@Override
@@ -58,7 +60,7 @@ public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
 		Document doc;
 		do {
 			doc = Jsoup.connect(buildSearchUrl(entity, currentPage)).data("action", "loadmore")
-					.data("query", URLEncoder.encode("{\"s\":\"" + entity.getName() + "\",\"order\":\"DESC\"}"))
+					.data("query", encodeUrl("{\"s\":\"" + entity.getName() + "\",\"order\":\"DESC\"}"))
 					.data("page", Integer.toString(currentPage++)).post();
 
 			articlesElements.addAll(extractArticlesElements(doc));

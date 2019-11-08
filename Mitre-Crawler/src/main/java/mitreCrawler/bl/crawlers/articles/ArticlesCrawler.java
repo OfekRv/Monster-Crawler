@@ -1,6 +1,8 @@
 package mitreCrawler.bl.crawlers.articles;
 
 import static utils.CrawelersUtils.extractUrl;
+import static utils.CrawelersUtils.getRequest;
+import static utils.CrawelersUtils.getRequestIgnoringBadStatusCode;
 import static utils.CrawelersUtils.paddedWithSpaces;
 
 import java.io.IOException;
@@ -47,7 +49,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 			} else {
 				getLogger().info("[ARTICLE] saving \"" + articleUrl + "\"");
 				article = new Article(articleUrl, extractTitle(articleElement), content,
-						parseArticleDate(articleElement));
+						getArticleDate(articleElement));
 				relateEntityAndSave(entityToCrawl, article);
 			}
 
@@ -60,7 +62,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 	}
 
 	public default String getArticleContent(String url) throws IOException {
-		Document doc = Jsoup.connect(url).get();
+		Document doc = getRequest(url);
 		doc.select("script,link,footer,img,image,iframe,.hidden,style,path,meta,form").remove();
 		return doc.html();
 	}
@@ -71,7 +73,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		Elements currentArticlesElements;
 		Document doc;
 		do {
-			doc = Jsoup.connect(buildSearchUrl(entity, currentPage)).ignoreHttpErrors(true).get();
+			doc = getRequestIgnoringBadStatusCode(buildSearchUrl(entity, currentPage));
 
 			currentArticlesElements = extractArticlesElements(doc);
 			articlesElements.addAll(currentArticlesElements);
@@ -81,7 +83,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		return articlesElements;
 	}
 
-	public default LocalDate parseArticleDate(Element article) {
+	public default LocalDate getArticleDate(Element article) {
 		return LocalDate.parse(extractArticleDate(article),
 				DateTimeFormatter.ofPattern(getDateFormatPattern(), Locale.US));
 	}

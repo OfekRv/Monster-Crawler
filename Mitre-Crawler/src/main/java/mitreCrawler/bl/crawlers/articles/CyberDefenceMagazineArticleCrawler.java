@@ -1,5 +1,7 @@
 package mitreCrawler.bl.crawlers.articles;
 
+import static utils.CrawelersUtils.encodeUrl;
+
 import javax.inject.Named;
 
 import org.jsoup.nodes.Document;
@@ -11,7 +13,7 @@ import mitreCrawler.entities.Group;
 
 // Not very stable source
 
-@Named
+//@Named
 public class CyberDefenceMagazineArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private static final String SEARCH_QUERY = "?s=";
 	private static final String PAGE = "page/";
@@ -21,7 +23,7 @@ public class CyberDefenceMagazineArticleCrawler extends AbstractArticlesCrawler<
 
 	@Override
 	public String buildUrl(Group entity) {
-		return cyberDefenceMagazineUrl + SEARCH_QUERY + '"' + entity.getName().replace(" ", "%20") + '"';
+		return cyberDefenceMagazineUrl + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
 	}
 
 	@Override
@@ -32,7 +34,7 @@ public class CyberDefenceMagazineArticleCrawler extends AbstractArticlesCrawler<
 
 	@Override
 	public String extractTitle(Element article) {
-		return article.select("h3").first().text();
+		return article.selectFirst("h3").text();
 	}
 
 	@Override
@@ -42,7 +44,7 @@ public class CyberDefenceMagazineArticleCrawler extends AbstractArticlesCrawler<
 
 	@Override
 	public String extractArticleDate(Element article) {
-		return article.select("time").first().text();
+		return article.selectFirst("time").text();
 	}
 
 	@Override
