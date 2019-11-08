@@ -1,6 +1,5 @@
 package mitreCrawler.bl.crawlers.articles;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -8,7 +7,6 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -45,7 +43,6 @@ public class CywareArticlesCrawler implements ArticlesCrawler<Group> {
 	public String extractTitle(Element article) {
 		return article.select("img").first().attr("title");
 	}
-
 
 	@Override
 	public LocalDate extractArticleDate(Element article) {
