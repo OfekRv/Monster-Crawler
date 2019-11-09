@@ -65,6 +65,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 
 	public default Elements loadAndExtractNextArticles(E entity) {
 		int currentPage = getFirstSearchPageIndex();
+		int lastPage = getPageLimit();
 		Elements articlesElements = new Elements();
 		Elements currentArticlesElements;
 		Document doc;
@@ -81,7 +82,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 			currentArticlesElements = extractArticlesElements(doc);
 			articlesElements.addAll(currentArticlesElements);
 			currentPage++;
-		} while (!currentArticlesElements.isEmpty());
+		} while (!currentArticlesElements.isEmpty() && currentPage <= lastPage);
 
 		return articlesElements;
 	}
@@ -108,6 +109,10 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 	public String getDateFormatPattern();
 
 	public int getFirstSearchPageIndex();
+
+	public default int getPageLimit() {
+		return 20;
+	}
 
 	public ArticleRepository getRepository();
 
