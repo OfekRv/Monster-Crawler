@@ -1,5 +1,6 @@
 package monsterCrawler.bl.crawlers.articles;
 
+import static monsterCrawler.utils.CrawelersUtils.EMPTY;
 import static monsterCrawler.utils.CrawelersUtils.getFirstElementByClass;
 
 import javax.inject.Named;
@@ -32,7 +33,7 @@ public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> {
 	@Override
 	public String buildSearchUrl(Group entity, int currentPage) {
 		// TODO
-		return "";
+		return EMPTY;
 	}
 
 	@Override

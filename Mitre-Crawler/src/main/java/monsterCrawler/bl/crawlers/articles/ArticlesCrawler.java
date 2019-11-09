@@ -74,8 +74,8 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 				doc = getSearchPage(entity, currentPage);
 			} catch (IOException e) {
 				getLogger()
-						.warn("[ARTICLE] Could not get next articles, maybe not exists or server problem. stopped before page number \""
-								+ currentPage + "\" (" + this.getClass().getName() + ")");
+						.warn("[ARTICLE] Could not get next articles, maybe not exists or server problem. stopped before page number "
+								+ currentPage + " (" + this.getClass().getName() + ")");
 				return articlesElements;
 			}
 
