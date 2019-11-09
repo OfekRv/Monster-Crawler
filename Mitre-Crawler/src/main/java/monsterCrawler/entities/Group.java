@@ -45,13 +45,20 @@ public class Group implements NamedEntity {
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "atk_softwares_in_groups", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "software_id"))
 	private Set<Software> softwares;
-	/*
-	 * @ManyToMany(fetch = FetchType.EAGER)
-	 * 
-	 * @JoinTable(name = "atk_groups_in_articles", joinColumns
-	 * = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name =
-	 * "article_id")) private Set<Article> articles;
-	 */
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "atk_groups_in_articles", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "article_id"))
+	private Set<Article> articles;
+
+	public Group(String id, String name, String description, Collection<String> aliases, Set<Technique> techniques,
+			Set<Software> softwares) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.aliases = aliases;
+		this.techniques = techniques;
+		this.softwares = softwares;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -72,4 +79,5 @@ public class Group implements NamedEntity {
 				&& groupNames.containsAll(objectGroupNames) && objectGroupNames.containsAll(groupNames)
 				&& softwares.containsAll(g.softwares) && g.softwares.containsAll(softwares);
 	}
+
 }

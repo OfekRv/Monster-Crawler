@@ -23,14 +23,14 @@ public class CrawlerSchedulator {
 	@Inject
 	private GroupRepository groupRepository;
 
-	// @Scheduled(cron = "${cron.expression}")
+	 @Scheduled(cron = "${cron.expression}")
 	public void executeGroupsCrawler() {
 		log.info("started executing groups crawler");
 		groupsCrawler.crawl();
 		log.info("finished executing groups crawler");
 	}
 
-	@Scheduled(cron = "${cron.expression}")
+	//@Scheduled(cron = "${cron.expression}")
 	public void executeArticlesCrawler() {
 		log.info("started executing atricles crawler");
 		for (Group group : groupRepository.findAll()) {
