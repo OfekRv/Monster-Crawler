@@ -30,8 +30,8 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 				CrawlArticle(entityToCrawl, articleElement);
 			}
 		} catch (IOException e) {
-			getLogger().warn("[ARTICLE] Session interrupted for crawler: " + this.getClass().getName()
-					+ " with entity: " + entityToCrawl.getName());
+			getLogger().warn("[ARTICLE] Could not search server with crawler: " + this.getClass().getName()
+					+ " for entity: " + entityToCrawl.getName());
 		}
 	}
 
@@ -72,8 +72,9 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 			try {
 				doc = getSearchPage(entity, currentPage);
 			} catch (IOException e) {
-				getLogger().warn("[ARTICLE] Session interrupted for next articles page number \"" + currentPage + "\" ("
-						+ this.getClass().getName() + ")");
+				getLogger()
+						.warn("[ARTICLE] Could not get next articles, maybe not exists or server problem. stopped before page number \""
+								+ currentPage + "\" (" + this.getClass().getName() + ")");
 				return articlesElements;
 			}
 

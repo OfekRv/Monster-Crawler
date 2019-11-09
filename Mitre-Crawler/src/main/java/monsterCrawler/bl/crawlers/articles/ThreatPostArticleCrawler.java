@@ -45,7 +45,7 @@ public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public String extractArticleDate(Element article) {
-		return getFirstElementByClass(article, "time").attr("datetime").split("T")[0];
+		return article.select("time").attr("datetime").split("T")[0];
 	}
 
 	@Override

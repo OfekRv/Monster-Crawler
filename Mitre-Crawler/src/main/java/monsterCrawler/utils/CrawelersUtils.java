@@ -37,7 +37,7 @@ public class CrawelersUtils {
 			doc.select(htmlTagsBlackList).remove();
 			return doc.html();
 		} catch (IOException e) {
-			log.warn("[ARTICLE] Session interrupted while downloading \"" + url + "\"");
+			log.warn("[ARTICLE] Could not download \"" + url + "\" " + "mayble not exist or server error");
 			return EMPTY;
 		}
 	}
