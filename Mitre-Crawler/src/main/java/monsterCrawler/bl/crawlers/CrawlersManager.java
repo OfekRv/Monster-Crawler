@@ -5,8 +5,6 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.springframework.scheduling.annotation.Scheduled;
-
 import lombok.extern.slf4j.Slf4j;
 import monsterCrawler.bl.crawlers.articles.ArticlesCrawler;
 import monsterCrawler.bl.crawlers.groups.AttackGroupsCrawler;
@@ -23,10 +21,9 @@ public class CrawlersManager {
 	@Inject
 	private GroupRepository groupRepository;
 
-	@Scheduled(cron = "${cron.expression}")
 	public void crawl() {
 		log.info("Started executing groups crawler");
-		groupsCrawler.crawl();
+	//	groupsCrawler.crawl();
 		log.info("Finished executing groups crawler");
 
 		log.info("Started executing atricles crawler");

@@ -32,12 +32,12 @@ public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> {
 	public void CrawlArticle(Group entityToCrawl, Element articleElement) {
 		super.CrawlArticle(entityToCrawl, articleElement);
 		String url = extractUrl(articleElement);
-		if (getRepository().existsByUrl(url)) {
-			Article crawledArticle = getRepository().findByUrl(url);
+		if (getArticlesRepository().existsByUrl(url)) {
+			Article crawledArticle = getArticlesRepository().findByUrl(url);
 			if (crawledArticle.getDate() == null) {
-				crawledArticle
-						.setDate(extractArticleDateFromInsideTheArticle(Jsoup.parse(crawledArticle.getContent())));
-				getRepository().saveAndFlush(crawledArticle);
+				crawledArticle.setDate(extractArticleDateFromInsideTheArticle(Jsoup
+						.parse(getArticlesContentRepository().findById(crawledArticle.getId()).get().getContent())));
+				getArticlesRepository().saveAndFlush(crawledArticle);
 			}
 		}
 	}

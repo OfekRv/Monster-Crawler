@@ -17,7 +17,9 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 
 import monsterCrawler.entities.Article;
+import monsterCrawler.entities.ArticleContent;
 import monsterCrawler.entities.NamedEntity;
+import monsterCrawler.repositories.ArticleContentRepository;
 import monsterCrawler.repositories.ArticleRepository;
 
 public interface ArticlesCrawler<E extends NamedEntity> {
@@ -42,25 +44,25 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 
 		if (content.contains(paddedWithSpaces(entityToCrawl.getName()))) {
 			Article article;
-			if (getRepository().existsByUrl(articleUrl)) {
-				article = getRepository().findByUrl(articleUrl);
+			if (getArticlesRepository().existsByUrl(articleUrl)) {
+				article = getArticlesRepository().findByUrl(articleUrl);
 				if (!article.isRelatedEntity(entityToCrawl)) {
 					getLogger().info("[ARTICLE] found another related entity in \"" + articleUrl + "\"");
 					relateEntityAndSave(entityToCrawl, article);
 				}
 			} else {
 				getLogger().info("[ARTICLE] saving \"" + articleUrl + "\"");
-				article = new Article(articleUrl, extractTitle(articleElement), content,
-						getArticleDate(articleElement));
-				relateEntityAndSave(entityToCrawl, article);
+				article = new Article(articleUrl, extractTitle(articleElement), getArticleDate(articleElement));
+				article = relateEntityAndSave(entityToCrawl, article);
+				getArticlesContentRepository().saveAndFlush(new ArticleContent(article.getId(), content));
 			}
 
 		}
 	}
 
-	public default void relateEntityAndSave(E entityToCrawl, Article article) {
+	public default Article relateEntityAndSave(E entityToCrawl, Article article) {
 		article.addRelatedEntity(entityToCrawl);
-		getRepository().saveAndFlush(article);
+		return getArticlesRepository().saveAndFlush(article);
 	}
 
 	public default Elements loadAndExtractNextArticles(E entity) {
@@ -114,7 +116,9 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		return 20;
 	}
 
-	public ArticleRepository getRepository();
+	public ArticleRepository getArticlesRepository();
+
+	public ArticleContentRepository getArticlesContentRepository();
 
 	public Logger getLogger();
 }

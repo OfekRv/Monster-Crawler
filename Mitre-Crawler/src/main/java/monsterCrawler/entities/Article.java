@@ -13,12 +13,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,19 +41,21 @@ public class Article {
 	private String title;
 	@Column(nullable = true, unique = false)
 	private LocalDate date;
-	@Lob
-	@JsonIgnore
-	private String content;
-	// should move to group when the group crawler will also crawler articles
+	/*
+	 * @Column(columnDefinition = "TEXT", nullable = true, unique = false)
+	 * 
+	 * @Basic(fetch = FetchType.LAZY)
+	 * 
+	 * @JsonIgnore private String content;
+	 */
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "atk_groups_in_articles", joinColumns = @JoinColumn(name = "article_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
 	private Set<Group> groups;
 
-	public Article(String url, String title, String content, LocalDate date) {
+	public Article(String url, String title, LocalDate date) {
 		super();
 		this.url = url;
 		this.title = title;
-		this.content = content;
 		this.date = date;
 		this.groups = new HashSet<Group>();
 	}

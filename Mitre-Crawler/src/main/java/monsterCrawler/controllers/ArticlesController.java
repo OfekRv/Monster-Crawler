@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import monsterCrawler.entities.Article;
-import monsterCrawler.repositories.ArticleRepository;
+import monsterCrawler.entities.ArticleContent;
+import monsterCrawler.repositories.ArticleContentRepository;
 
 @RestController
 @RequestMapping("api/articles")
 public class ArticlesController {
 	@Inject
-	ArticleRepository repository;
+	ArticleContentRepository repository;
 
 	@GetMapping("/{id}/content")
 	public @ResponseBody String getArticleContent(@PathVariable int id) throws Exception {
-		Optional<Article> article = repository.findById(id);
+		Optional<ArticleContent> article = repository.findById(id);
 		if (article.isPresent()) {
 			return article.get().getContent();
 		} else {
