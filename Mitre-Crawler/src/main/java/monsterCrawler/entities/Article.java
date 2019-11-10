@@ -41,7 +41,7 @@ public class Article {
 	private String title;
 	@Column(nullable = true, unique = false)
 	private LocalDate date;
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "atk_groups_in_articles", joinColumns = @JoinColumn(name = "article_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
 	private Set<Group> groups;
 
