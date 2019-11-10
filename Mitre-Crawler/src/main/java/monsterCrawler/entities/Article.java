@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "atk_atricles")
+@Table(name = "atk_articles")
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -41,14 +41,7 @@ public class Article {
 	private String title;
 	@Column(nullable = true, unique = false)
 	private LocalDate date;
-	/*
-	 * @Column(columnDefinition = "TEXT", nullable = true, unique = false)
-	 * 
-	 * @Basic(fetch = FetchType.LAZY)
-	 * 
-	 * @JsonIgnore private String content;
-	 */
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "atk_groups_in_articles", joinColumns = @JoinColumn(name = "article_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
 	private Set<Group> groups;
 

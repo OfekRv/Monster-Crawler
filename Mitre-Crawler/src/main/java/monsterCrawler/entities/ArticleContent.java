@@ -27,4 +27,5 @@ public class ArticleContent {
 	@Column(columnDefinition = "TEXT", nullable = true, unique = false)
 	@Basic(fetch = FetchType.LAZY)
 	private String content;
+
 }

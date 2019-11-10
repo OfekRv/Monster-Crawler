@@ -45,7 +45,7 @@ public class Group implements NamedEntity {
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "atk_softwares_in_groups", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "software_id"))
 	private Set<Software> softwares;
-	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups")
 	private Set<Article> articles;
 
 	public Group(String id, String name, String description, Collection<String> aliases, Set<Technique> techniques,
