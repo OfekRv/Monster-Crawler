@@ -3,6 +3,7 @@ package monsterCrawler.entities;
 import java.util.Collection;
 import java.util.Objects;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -30,6 +31,7 @@ public class Technique implements NamedEntity {
 	@Column(nullable = false, unique = false)
 	private String name;
 	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "atk_techniques_tactics")
 	@Column(nullable = true, unique = false)
 	private Collection<String> tactic;
 	@Column(length = 50000, nullable = true, unique = false)
