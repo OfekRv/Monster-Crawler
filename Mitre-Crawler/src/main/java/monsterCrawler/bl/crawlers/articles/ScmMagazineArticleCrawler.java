@@ -1,6 +1,9 @@
 package monsterCrawler.bl.crawlers.articles;
 
 import static monsterCrawler.utils.CrawelersUtils.encodeUrl;
+import static monsterCrawler.utils.CrawelersUtils.getFirstElementByClass;
+
+import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -16,17 +19,17 @@ public class ScmMagazineArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private static final String SEARCH_QUERY = "?s=";
 	private static final String PAGE = "page/";
 
-	@Value("${SCM_MAGAZINE_URL}")
-	private String scmMagazineUrl;
+	@Value("${SCM_URL}")
+	private String scmUrl;
 
 	@Override
 	public String buildUrl(Group entity) {
-		return scmMagazineUrl + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
+		return scmUrl + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
 	}
 
 	@Override
 	public String buildSearchUrl(Group entity, int currentPage) {
-		return scmMagazineUrl + PAGE + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
+		return scmUrl + PAGE + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
 	}
 
 	@Override
@@ -36,7 +39,12 @@ public class ScmMagazineArticleCrawler extends AbstractArticlesCrawler<Group> {
 
 	@Override
 	public Elements extractArticlesElements(Document doc) {
-		return doc.select("article");
+		Optional<Element> articleContainer = Optional
+				.ofNullable(getFirstElementByClass(doc, "hm-container -no-sidebar"));
+		if (!articleContainer.isPresent()) {
+			return new Elements();
+		}
+		return articleContainer.get().select("article");
 	}
 
 	@Override
