@@ -17,11 +17,11 @@ import monsterCrawler.repositories.ArticleContentRepository;
 @RequestMapping("api/articles")
 public class ArticlesController {
 	@Inject
-	ArticleContentRepository repository;
+	ArticleContentRepository articleContentRepository;
 
 	@GetMapping("/{id}/content")
 	public @ResponseBody String getArticleContent(@PathVariable int id) throws Exception {
-		Optional<ArticleContent> article = repository.findById(id);
+		Optional<ArticleContent> article = articleContentRepository.findById(id);
 		if (article.isPresent()) {
 			return article.get().getContent();
 		} else {

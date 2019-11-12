@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import monsterCrawler.entities.Article;
 import monsterCrawler.entities.Group;
 
-//@Named
+@Named
 public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private static final String SEARCH = "search.html?q=";
 	private static final String RESULTS_PER_PAGE = "&numResultsPerPage=500";

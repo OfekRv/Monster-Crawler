@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import monsterCrawler.entities.Group;
 
-//@Named
+@Named
 public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> {
 	private static final String SEARCH = "search/";
 

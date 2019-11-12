@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import monsterCrawler.entities.Group;
 
-//@Named
+@Named
 public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private static final String SEARCH = "?s=";
 	private static final String API_URL = "wp-admin/admin-ajax.php";

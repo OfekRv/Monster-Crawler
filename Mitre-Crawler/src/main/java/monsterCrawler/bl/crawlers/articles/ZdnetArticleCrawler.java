@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import monsterCrawler.entities.Group;
 
-//@Named
+@Named
 public class ZdnetArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private static final String SEARCH = "search/";
 	private static final String SEARCH_QUERY = "?o=1&q=";

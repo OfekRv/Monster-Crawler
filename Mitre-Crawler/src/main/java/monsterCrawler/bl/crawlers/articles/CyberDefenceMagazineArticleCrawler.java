@@ -13,7 +13,7 @@ import monsterCrawler.entities.Group;
 
 // Not very stable source
 
-//@Named
+@Named
 public class CyberDefenceMagazineArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private static final String SEARCH_QUERY = "?s=";
 	private static final String PAGE = "page/";
