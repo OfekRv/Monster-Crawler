@@ -12,7 +12,7 @@ public class CrawlerSchedulator {
 	@Inject
 	private CrawlersManager crawlersManager;
 
-	//@Scheduled(cron = "${cron.expression}")
+	@Scheduled(cron = "${cron.expression}")
 	public void executeCrawlers() {
 		crawlersManager.crawl();
 	}

@@ -8,7 +8,7 @@
 	href="https://use.fontawesome.com/releases/v5.11.1/css/all.css">
 </head>
 <body ng-app="monsterApp" bgcolor="black">
-	<div ng-controller="monsterAppController" id="mynetwork"></div>
+	<div ng-controller="monsterGraphController" id="mynetwork"></div>
 
 	<script type="text/javascript">
 		var ngApp = angular.module('monsterApp', []);
@@ -17,7 +17,7 @@
 		});
 		ngApp
 				.controller(
-						'monsterAppController',
+						'monsterGraphController',
 						function($scope, $http) {
 
 							var nodes = [];
@@ -250,7 +250,7 @@
 							};
 						});
 	</script>
-	<form name="hide" ng-controller="monsterAppController">
+	<form name="hide" ng-controller="monsterGraphController">
 		<input type="checkbox" ng-model="groupsCheckbox.articles"
 			ng-change="toggleArticles()"> articles <input type="checkbox"
 			ng-model="groupsCheckbox.softwares" ng-change="toggleSoftwares()">softwares

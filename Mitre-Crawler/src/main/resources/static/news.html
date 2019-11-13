@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>M0n5ter Cr&wler</title>
+
+<style type="text/css">
+body, html {
+	font-family: sans-serif;
+}
+</style>
+<script type="text/javascript"
+	src="https://unpkg.com/timeline-plus/dist/timeline.js"></script>
+<script type="text/javascript"
+	src="//unpkg.com/vis-timeline@latest/dist/vis-timeline-graph2d.min.js"></script>
+<link
+	href="//unpkg.com/vis-timeline@latest/dist/vis-timeline-graph2d.min.css"
+	rel="stylesheet" type="text/css" />
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<link rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.11.1/css/all.css">
+<link rel="stylesheet"
+	href="https://unpkg.com/timeline-plus/dist/timeline.css">
+
+</head>
+<body ng-app="monsterApp">
+	<div ng-controller="monsterTimelineController" id="visualization"></div>
+
+	<script type="text/javascript">
+		var ngApp = angular.module('monsterApp', []);
+		ngApp.config(function($qProvider) {
+			$qProvider.errorOnUnhandledRejections(false);
+		});
+		ngApp
+				.controller(
+						'monsterTimelineController',
+						function($scope, $http) {
+							// DOM element where the Timeline will be attached
+							var container = document
+									.getElementById('visualization');
+							var items = new vis.DataSet;
+
+							url = 'api/articles?sort=date,desc&size=100';
+							$http({
+								method : 'GET',
+								url : url
+							})
+									.then(
+											function successCallback(response) {
+												angular
+														.forEach(
+																response.data._embedded.articles,
+																function(
+																		article) {
+																	if (article.date != null) {
+																		url = article._links.groups.href;
+																		$http(
+																				{
+																					method : 'GET',
+																					url : url
+																				})
+																				.then(
+																						function successCallback(
+																								response) {
+																							angular
+																									.forEach(
+																											response.data._embedded.groups,
+																											function(
+																													group) {
+																												items
+																														.add({
+																															id : article.id,
+																															content : '<a href=\"/api/articles/'+article.id+'/content\">'
+																																	+ article.title
+																																	+ '</a>',
+																															start : article.date,
+																															group : group.id
+																														});
+																											});
+																						});
+																	}
+																});
+
+												// Configuration for the Timeline
+												var options = {
+													groupOrder : 'content'
+												};
+
+												// Create a Timeline
+												var timeline = new vis.Timeline(
+														container, items,
+														options);
+
+												var groups = new vis.DataSet();
+
+												url = 'api/groups';
+												$http({
+													method : 'GET',
+													url : url
+												})
+														.then(
+																function successCallback(
+																		response) {
+																	angular
+																			.forEach(
+																					response.data._embedded.groups,
+																					function(
+																							group) {
+																						groups
+																								.add({
+																									id : group.id,
+																									content : group.name,
+																									type : 'box'
+																								})
+																					});
+																//	timeline
+																		//	.setGroups(groups);
+																});
+											});
+						});
+	</script>
+</body>
