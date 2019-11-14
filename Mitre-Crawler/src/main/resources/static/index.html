@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>M0n5ter Cr&wler - Graph</title>
 <script type="text/javascript"
 	src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 <script
@@ -43,7 +44,8 @@
 																			.add({
 																				id : article.id,
 																				label : article.title,
-																				group : 'articles'
+																				group : 'articles',
+																				hidden : false
 																			});
 																	$http(
 																			{
@@ -73,7 +75,8 @@
 																														.add({
 																															id : group.id,
 																															label : group.name,
-																															group : groupCount
+																															group : groupCount,
+																															hidden : false
 																														//'usergroups'
 																														});
 																												$http(
@@ -104,7 +107,8 @@
 																																									.add({
 																																										id : software.id,
 																																										label : software.name,
-																																										group : 'softwares'
+																																										group : 'softwares',
+																																										hidden : true
 																																									});
 																																						}
 																																						network.body.data.edges
@@ -210,7 +214,7 @@
 
 							$scope.groupsCheckbox = {
 								articles : true,
-								softwares : true
+								softwares : false
 							};
 
 							$scope.toggleArticles = function() {
