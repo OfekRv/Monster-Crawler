@@ -94,8 +94,13 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 	}
 
 	public default LocalDate getArticleDate(Element article) {
-		return LocalDate.parse(extractArticleDate(article),
-				DateTimeFormatter.ofPattern(getDateFormatPattern(), Locale.US));
+		try {
+			return LocalDate.parse(extractArticleDate(article),
+					DateTimeFormatter.ofPattern(getDateFormatPattern(), Locale.US));
+		} catch (Exception e) {
+			getLogger().warn("[DATE] Could not parse date");
+			return null;
+		}
 	}
 
 	public String buildUrl(E entity);

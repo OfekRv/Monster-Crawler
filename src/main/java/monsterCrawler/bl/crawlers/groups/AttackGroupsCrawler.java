@@ -15,14 +15,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import lombok.extern.slf4j.Slf4j;
-import monsterCrawler.entities.ChangeLog;
 import monsterCrawler.entities.Group;
 import monsterCrawler.entities.Software;
 import monsterCrawler.entities.Technique;
-import monsterCrawler.repositories.ChangeLogRepository;
 import monsterCrawler.repositories.GroupRepository;
 import monsterCrawler.repositories.SoftwareRepository;
 import monsterCrawler.repositories.TechniqueRepository;
@@ -48,48 +45,23 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 	private SoftwareRepository softwaresRepository;
 	@Inject
 	private TechniqueRepository techniquesRepository;
-	@Inject
-	private ChangeLogRepository changeLogRepository;
 
 	@Override
 	public void crawl() {
 		try {
 			Document doc = Jsoup.connect(groupsUrl).get();
 			Collection<String> groupLinks = extractGroupLinksElements(doc);
-
-			ChangeLog changeLog = new ChangeLog();
-
 			Group currentGroup;
 			for (String link : groupLinks) {
 				doc = Jsoup.connect(link).get();
 				String groupName = extractName(doc);
 				log.info("[GROUP] getting \"" + groupName + "\"");
 				currentGroup = new Group(extractId(doc), groupName, extractDescription(doc), extractGroupAliases(doc),
-						getGroupTechniques(doc, changeLog), getGroupSoftwares(doc, changeLog));
-				saveOrUpdate(currentGroup, currentGroup.getId(), groupsRepository, changeLog);
+						getGroupTechniques(doc), getGroupSoftwares(doc));
+				groupsRepository.saveAndFlush(currentGroup);
 			}
-
-			if (changeLog.contanisChange()) {
-				changeLogRepository.save(changeLog);
-				log.info("change log saved");
-			} else {
-				log.info("no changes detected");
-			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	private <E, ID> void saveOrUpdate(E entity, ID id, JpaRepository<E, ID> repository, ChangeLog changeLog) {
-		if (repository.existsById(id)) {
-			E oldEntity = repository.findById(id).get();
-			E newEntity = repository.saveAndFlush(entity);
-			if (!oldEntity.equals(newEntity)) {
-				changeLog.addChange(newEntity);
-			}
-		} else {
-			changeLog.addChange(repository.saveAndFlush(entity));
 		}
 	}
 
@@ -126,14 +98,14 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 				.asList(details.get(TACTIC_INDEX).text().substring(TACTIC_PREFIX_CHAR_COUNT).split(TACTICS_SEPERATOR)));
 	}
 
-	private Set<Technique> getGroupTechniques(Document doc, ChangeLog changeLog) {
+	private Set<Technique> getGroupTechniques(Document doc) {
 		Set<Technique> techniques = new HashSet<>();
 		for (String techniqueLink : extractGroupTechniquesLinks(doc)) {
 			techniques.add(getTechniqueFromLink(techniqueLink));
 		}
 
 		techniques.stream().filter(technique -> technique != null)
-				.forEach(technique -> saveOrUpdate(technique, technique.getId(), techniquesRepository, changeLog));
+				.forEach(technique -> techniquesRepository.saveAndFlush(technique));
 		return techniques;
 	}
 
@@ -169,14 +141,14 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 		return technique;
 	}
 
-	private Set<Software> getGroupSoftwares(Document doc, ChangeLog changeLog) {
+	private Set<Software> getGroupSoftwares(Document doc) {
 		Set<Software> softwares = new HashSet<>();
 		for (String softwareLink : extractGroupSoftwaresLinks(doc)) {
 			softwares.add(getSoftwareFromLink(softwareLink));
 		}
 
 		softwares.stream().filter(software -> software != null)
-				.forEach(software -> saveOrUpdate(software, software.getId(), softwaresRepository, changeLog));
+				.forEach(software -> softwaresRepository.saveAndFlush(software));
 		return softwares;
 	}
 
