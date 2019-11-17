@@ -1,9 +1,7 @@
 package monsterCrawler.entities;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -58,25 +56,4 @@ public class Group implements NamedEntity {
 		this.techniques = techniques;
 		this.softwares = softwares;
 	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null)
-			return false;
-		if (getClass() != o.getClass())
-			return false;
-		Group g = (Group) o;
-
-		Collection<String> groupNames = techniques.stream().map(Technique::getName).collect(Collectors.toList());
-		Collection<String> objectGroupNames = g.techniques.stream().map(Technique::getName)
-				.collect(Collectors.toList());
-
-		return Objects.equals(id, g.id) && Objects.equals(name, g.name) && Objects.equals(description, g.description)
-				&& aliases.containsAll(g.aliases) && g.aliases.containsAll(aliases)
-				&& groupNames.containsAll(objectGroupNames) && objectGroupNames.containsAll(groupNames)
-				&& softwares.containsAll(g.softwares) && g.softwares.containsAll(softwares);
-	}
-
 }
