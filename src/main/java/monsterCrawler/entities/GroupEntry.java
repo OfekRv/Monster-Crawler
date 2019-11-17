@@ -14,5 +14,5 @@ import lombok.Setter;
 public class GroupEntry {
 	private String id;
 	private String name;
-	private Collection<Integer> articlesIds;
+	private Collection<ArticleEntry> articles;
 }

@@ -14,33 +14,30 @@ import monsterCrawler.entities.Article;
 import monsterCrawler.entities.ArticleEntry;
 import monsterCrawler.entities.Group;
 import monsterCrawler.entities.GroupEntry;
-import monsterCrawler.entities.RelationGraph;
+import monsterCrawler.entities.GroupsRelations;
 import monsterCrawler.repositories.ArticleRepository;
 import monsterCrawler.repositories.GroupRepository;
 
 @RestController
-@RequestMapping("api/relationGraph")
+@RequestMapping("api/")
 public class RelationGraphController {
 	@Inject
 	ArticleRepository articleRepository;
 	@Inject
 	GroupRepository groupRepository;
 
-	@GetMapping("/")
-	public @ResponseBody RelationGraph getRelationGraph() {
+	@GetMapping("/relationGraph")
+	public @ResponseBody GroupsRelations getRelationGraph() {
 		Collection<GroupEntry> groups = new ArrayList<>();
-		Collection<ArticleEntry> articles = new ArrayList<>();
-
-		Collection<Integer> articlesIds;
+		Collection<ArticleEntry> articles;
 		for (Group group : groupRepository.findAll()) {
-			articlesIds = new ArrayList<>();
+			articles = new ArrayList<>();
 			for (Article article : group.getArticles()) {
-				articlesIds.add(article.getId());
 				articles.add(new ArticleEntry(article.getId(), article.getTitle()));
 			}
-			groups.add(new GroupEntry(group.getId(), group.getName(), articlesIds));
+			groups.add(new GroupEntry(group.getId(), group.getName(), articles));
 		}
 
-		return new RelationGraph(groups, articles);
+		return new GroupsRelations(groups);
 	}
 }

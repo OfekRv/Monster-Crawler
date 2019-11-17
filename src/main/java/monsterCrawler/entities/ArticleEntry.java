@@ -11,5 +11,5 @@ import lombok.Setter;
 @Setter
 public class ArticleEntry {
 	private Integer id;
-	private String name;
+	private String title;
 }

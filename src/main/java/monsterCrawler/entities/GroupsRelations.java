@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class RelationGraph {
+public class GroupsRelations {
 	private Collection<GroupEntry> groups;
-	private Collection<ArticleEntry> articles;
 }

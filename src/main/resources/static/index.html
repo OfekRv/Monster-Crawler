@@ -16,243 +16,155 @@
 		ngApp.config(function($qProvider) {
 			$qProvider.errorOnUnhandledRejections(false);
 		});
-		ngApp
-				.controller(
-						'monsterGraphController',
-						function($scope, $http) {
+		ngApp.controller('monsterGraphController', function($scope, $http) {
 
-							var nodes = [];
-							var edges = []
+			var nodes = [];
+			var edges = []
 
-							url = 'api/articles?sort=date,desc&size=1000';
+			url = 'api/relationGraph';
 
-							$http({
-								method : 'GET',
-								url : url
-							})
-									.then(
-											function successCallback(response) {
-												var node;
-												var edge;
-												var groupCount = 1;
-												angular
-														.forEach(
-																response.data._embedded.articles,
-																function(
-																		article) {
-																	network.body.data.nodes
-																			.add({
-																				id : article.id,
-																				label : article.title,
-																				group : 'articles',
-																				hidden : false
-																			});
-																	$http(
-																			{
-																				method : 'GET',
-																				url : article._links.groups.href
-																			})
-																			.then(
-																					function successCallback(
-																							response) {
-																						angular
-																								.forEach(
-																										response.data._embedded.groups,
-																										function(
-																												group) {
-																											var isGroupExist = false;
-																											angular
-																													.forEach(
-																															network.body.data.nodes,
-																															function(
-																																	element) {
-																																if (element.id == group.id) {
-																																	isGroupExist = true;
-																																}
-																															});
-																											if (!isGroupExist) {
-																												network.body.data.nodes
-																														.add({
-																															id : group.id,
-																															label : group.name,
-																															group : groupCount,
-																															hidden : false
-																														//'usergroups'
-																														});
-																												$http(
-																														{
-																															method : 'GET',
-																															url : group._links.softwares.href
-																														})
-																														.then(
-																																function successCallback(
-																																		response) {
-																																	angular
-																																			.forEach(
-																																					response.data._embedded.softwares,
-																																					function(
-																																							software) {
-																																						var isSoftwareExist = false;
-																																						angular
-																																								.forEach(
-																																										network.body.data.nodes,
-																																										function(
-																																												element) {
-																																											if (element.id == software.id) {
-																																												isSoftwareExist = true;
-																																											}
-																																										});
-																																						if (!isSoftwareExist) {
-																																							network.body.data.nodes
-																																									.add({
-																																										id : software.id,
-																																										label : software.name,
-																																										group : 'softwares',
-																																										hidden : true
-																																									});
-																																						}
-																																						network.body.data.edges
-																																								.add({
-																																									from : group.id,
-																																									to : software.id
-																																								});
-																																					});
-																																	groupCount++;
-																																},
-																																function errorCallback(
-																																		response) {
-																																});
-																											}
-																											network.body.data.edges
-																													.add({
-																														from : group.id,
-																														to : article.id
-																													});
-																										});
-																						groupCount++;
-																					},
-																					function errorCallback(
-																							response) {
-																					});
-																	groupCount++;
-																});
-
-												network.body.emitter
-														.emit('_dataChanged');
-
-												network.redraw();
-											},
-											function errorCallback(response) {
-											});
-
-							var container = document
-									.getElementById('mynetwork');
-							var data = {
-								nodes : nodes,
-								edges : edges
-							};
-							var options = {
-								nodes : {
-									icon : {
-										face : "'Font Awesome 5 Free'",
-										weight : "bold", // Font Awesome 5 doesn't work properly unless bold.
-										code : '\uf0c0',
-									},
-									borderWidth : 3,
-								},
-								edges : {
-									width : 2,
-									smooth : {
-										type : 'continuous'
-									}
-								},
-								groups : {
-									usergroups : {
-										shape : 'icon',
-										font : {
-											color : 'white'
-										},
-										icon : {
-											face : "'Font Awesome 5 Free'",
-											weight : "bold", // Font Awesome 5 doesn't work properly unless bold.
-											code : '\uf0c0',
-											color : '#e60000'
-										}
-									},
-									articles : {
-										shape : 'icon',
-										font : {
-											size : 8,
-											color : '#ff99ff'
-										},
-										icon : {
-											face : "'Font Awesome 5 Free'",
-											weight : "bold", // Font Awesome 5 doesn't work properly unless bold.
-											code : '\uf15b',
-											size : 30,
-											color : '#990099'
-										}
-									},
-									softwares : {
-										shape : 'icon',
-										font : {
-											size : 8,
-											color : '#ff99ff'
-										},
-										icon : {
-											face : "'Font Awesome 5 Free'",
-											weight : "bold", // Font Awesome 5 doesn't work properly unless bold.
-											code : '\uf188',
-											size : 30,
-											color : '#990099'
-										}
-									}
+			$http({
+				method : 'GET',
+				url : url
+			}).then(
+					function successCallback(response) {
+						var node;
+						var edge;
+						var groupCount = 1;
+						angular.forEach(response.data.groups, function(group) {
+							network.body.data.nodes.add({
+								id : group.id,
+								label : group.name,
+								group : groupCount,
+								hidden : false
+							});
+							angular.forEach(group.articles, function(article) {
+								var isArticleExist = false;
+								angular.forEach(network.body.data.nodes,
+										function(element) {
+											if (element.id == article.id) {
+												isArticleExist = true;
+											}
+										});
+								if (!isArticleExist) {
+									network.body.data.nodes.add({
+										id : article.id,
+										label : article.title,
+										group : 'articles',
+										hidden : false
+									});
 								}
-							};
-							var network = new vis.Network(container, data,
-									options);
 
-							$scope.groupsCheckbox = {
-								articles : true,
-								softwares : false
-							};
-
-							$scope.toggleArticles = function() {
-								angular
-										.forEach(
-												network.body.data.nodes,
-												function(node) {
-													if (node.group == 'articles') {
-														network.body.data.nodes
-																.update([ {
-																	id : node.id,
-																	hidden : !($scope.groupsCheckbox.articles)
-																} ]);
-													}
-												});
-
+								network.body.data.edges.add({
+									from : group.id,
+									to : article.id
+								});
 								network.body.emitter.emit('_dataChanged');
 								network.redraw();
-							};
-
-							$scope.toggleSoftwares = function() {
-								angular
-										.forEach(
-												network.body.data.nodes,
-												function(node) {
-													if (node.group == 'softwares') {
-														network.body.data.nodes
-																.update([ {
-																	id : node.id,
-																	hidden : !($scope.groupsCheckbox.softwares)
-																} ]);
-													}
-												});
-
-								network.body.emitter.emit('_dataChanged');
-								network.redraw();
-							};
+								groupCount++;
+							});
 						});
+					}, function errorCallback(response) {
+					});
+
+			var container = document.getElementById('mynetwork');
+			var data = {
+				nodes : nodes,
+				edges : edges
+			};
+			var options = {
+				nodes : {
+					icon : {
+						face : "'Font Awesome 5 Free'",
+						weight : "bold", // Font Awesome 5 doesn't work properly unless bold.
+						code : '\uf0c0',
+					},
+					borderWidth : 3,
+				},
+				edges : {
+					width : 2,
+					smooth : {
+						type : 'continuous'
+					}
+				},
+				groups : {
+					usergroups : {
+						shape : 'icon',
+						font : {
+							color : 'white'
+						},
+						icon : {
+							face : "'Font Awesome 5 Free'",
+							weight : "bold", // Font Awesome 5 doesn't work properly unless bold.
+							code : '\uf0c0',
+							color : '#e60000'
+						}
+					},
+					articles : {
+						shape : 'icon',
+						font : {
+							size : 8,
+							color : '#ff99ff'
+						},
+						icon : {
+							face : "'Font Awesome 5 Free'",
+							weight : "bold", // Font Awesome 5 doesn't work properly unless bold.
+							code : '\uf15b',
+							size : 30,
+							color : '#990099'
+						}
+					},
+					softwares : {
+						shape : 'icon',
+						font : {
+							size : 8,
+							color : '#ff99ff'
+						},
+						icon : {
+							face : "'Font Awesome 5 Free'",
+							weight : "bold", // Font Awesome 5 doesn't work properly unless bold.
+							code : '\uf188',
+							size : 30,
+							color : '#990099'
+						}
+					}
+				}
+			};
+			var network = new vis.Network(container, data, options);
+
+			$scope.groupsCheckbox = {
+				articles : true,
+				softwares : false
+			};
+
+			$scope.toggleArticles = function() {
+				angular.forEach(network.body.data.nodes, function(node) {
+					if (node.group == 'articles') {
+						network.body.data.nodes.update([ {
+							id : node.id,
+							hidden : !($scope.groupsCheckbox.articles)
+						} ]);
+					}
+				});
+
+				network.body.emitter.emit('_dataChanged');
+				network.redraw();
+			};
+
+			$scope.toggleSoftwares = function() {
+				angular.forEach(network.body.data.nodes, function(node) {
+					if (node.group == 'softwares') {
+						network.body.data.nodes.update([ {
+							id : node.id,
+							hidden : !($scope.groupsCheckbox.softwares)
+						} ]);
+					}
+				});
+
+				network.body.emitter.emit('_dataChanged');
+				network.redraw();
+			};
+		});
 	</script>
 	<form name="hide" ng-controller="monsterGraphController">
 		<input type="checkbox" ng-model="groupsCheckbox.articles"
