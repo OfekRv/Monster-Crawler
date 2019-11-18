@@ -59,11 +59,11 @@
 									from : group.id,
 									to : article.id
 								});
-								network.body.emitter.emit('_dataChanged');
-								network.redraw();
 								groupCount++;
 							});
 						});
+						network.body.emitter.emit('_dataChanged');
+						network.redraw();
 					}, function errorCallback(response) {
 					});
 
@@ -72,6 +72,7 @@
 				nodes : nodes,
 				edges : edges
 			};
+	
 			var options = {
 				nodes : {
 					icon : {
@@ -132,11 +133,6 @@
 			};
 			var network = new vis.Network(container, data, options);
 
-			$scope.groupsCheckbox = {
-				articles : true,
-				softwares : false
-			};
-
 			$scope.toggleArticles = function() {
 				angular.forEach(network.body.data.nodes, function(node) {
 					if (node.group == 'articles') {
@@ -166,10 +162,5 @@
 			};
 		});
 	</script>
-	<form name="hide" ng-controller="monsterGraphController">
-		<input type="checkbox" ng-model="groupsCheckbox.articles"
-			ng-change="toggleArticles()"> articles <input type="checkbox"
-			ng-model="groupsCheckbox.softwares" ng-change="toggleSoftwares()">softwares
-	</form>
 </body>
 </html>
