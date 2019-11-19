@@ -9,15 +9,14 @@
 	href="https://use.fontawesome.com/releases/v5.11.1/css/all.css">
 </head>
 <body ng-app="monsterApp" bgcolor="black">
-	<div ng-controller="monsterGraphController" id="mynetwork"></div>
-
+	<div ng-controller="monsterGraphController" id="mynetwork">    </div>
 	<script type="text/javascript">
 		var ngApp = angular.module('monsterApp', []);
 		ngApp.config(function($qProvider) {
 			$qProvider.errorOnUnhandledRejections(false);
 		});
 		ngApp.controller('monsterGraphController', function($scope, $http) {
-
+			$scope.loadPercent = 0;
 			var nodes = [];
 			var edges = []
 
@@ -62,8 +61,6 @@
 								groupCount++;
 							});
 								});
-						network.body.emitter.emit('_dataChanged');
-						network.redraw();
 					}, function errorCallback(response) {
 					});
 
@@ -73,7 +70,7 @@
 				edges : edges
 			};
 	
-			var options = {
+			var options = {   
 				nodes : {
 					icon : {
 						face : "'Font Awesome 5 Free'",
@@ -132,7 +129,6 @@
 				}
 			};
 			var network = new vis.Network(container, data, options);
-
 			$scope.toggleArticles = function() {
 				angular.forEach(network.body.data.nodes, function(node) {
 					if (node.group == 'articles') {
@@ -142,9 +138,6 @@
 						} ]);
 					}
 				});
-
-				network.body.emitter.emit('_dataChanged');
-				network.redraw();
 			};
 
 			$scope.toggleSoftwares = function() {
@@ -156,9 +149,6 @@
 						} ]);
 					}
 				});
-
-				network.body.emitter.emit('_dataChanged');
-				network.redraw();
 			};
 		});
 	</script>
