@@ -7,16 +7,45 @@
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
 <link rel="stylesheet"
 	href="https://use.fontawesome.com/releases/v5.11.1/css/all.css">
+<style type="text/css">
+#loader {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+	background-color: grey;
+	opacity: .8;
+	height: 100%;
+	z-index: 1000;
+}
+
+.ajax-loader {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -32px; /* -1 * image width / 2 */
+	margin-top: -32px; /* -1 * image height / 2 */
+	display: block;
+}
+</style>
 </head>
 <body ng-app="monsterApp" bgcolor="black">
-	<div ng-controller="monsterGraphController" id="mynetwork">    </div>
+	<div ng-controller="monsterGraphController" id="loader"
+		ng-hide="isLoaded">
+		<img
+			src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/35771931234507.564a1d2403b3a.gif"
+			class="ajax-loader" />
+	</div>
+	<div ng-controller="monsterGraphController" id="mynetwork"></div>
 	<script type="text/javascript">
 		var ngApp = angular.module('monsterApp', []);
 		ngApp.config(function($qProvider) {
 			$qProvider.errorOnUnhandledRejections(false);
 		});
 		ngApp.controller('monsterGraphController', function($scope, $http) {
-			$scope.loadPercent = 0;
+			$scope.isLoaded = false;
 			var nodes = [];
 			var edges = []
 
@@ -60,7 +89,8 @@
 								});
 								groupCount++;
 							});
-								});
+						});
+						$scope.isLoaded = true;
 					}, function errorCallback(response) {
 					});
 
@@ -69,8 +99,8 @@
 				nodes : nodes,
 				edges : edges
 			};
-	
-			var options = {   
+
+			var options = {
 				nodes : {
 					icon : {
 						face : "'Font Awesome 5 Free'",

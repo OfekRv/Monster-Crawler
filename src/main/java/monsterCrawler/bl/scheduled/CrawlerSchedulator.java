@@ -12,8 +12,13 @@ public class CrawlerSchedulator {
 	@Inject
 	private CrawlersManager crawlersManager;
 
-	@Scheduled(cron = "${cron.expression}")
-	public void executeCrawlers() {
-		crawlersManager.crawl();
+	@Scheduled(cron = "${ARTICLES_CRAWLER_EXECUTION_TIMING}")
+	public void executeArticlesCrawler() {
+		crawlersManager.crawlArticles();
+	}
+
+	@Scheduled(cron = "${GROUPS_CRAWLER_EXECUTION_TIMING}")
+	public void executeGroupsCrawler() {
+		crawlersManager.crawlArticles();
 	}
 }

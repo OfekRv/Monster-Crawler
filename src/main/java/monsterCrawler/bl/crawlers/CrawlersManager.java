@@ -21,11 +21,7 @@ public class CrawlersManager {
 	@Inject
 	private GroupRepository groupRepository;
 
-	public void crawl() {
-		log.info("Started executing groups crawler");
-	//	groupsCrawler.crawl();
-		log.info("Finished executing groups crawler");
-
+	public void crawlArticles() {
 		log.info("Started executing atricles crawler");
 		for (Group group : groupRepository.findAll()) {
 			log.info("[GROUP] " + group.getName());
@@ -33,6 +29,12 @@ public class CrawlersManager {
 				articlesCrawler.crawl(group);
 			}
 		}
+		log.info("Finished executing articles crawler");
+	}
+
+	public void crawlGroups() {
+		log.info("Started executing groups crawler");
+		groupsCrawler.crawl();
 		log.info("Finished executing groups crawler");
 	}
 }
