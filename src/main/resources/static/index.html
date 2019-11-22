@@ -45,62 +45,17 @@
 			$qProvider.errorOnUnhandledRejections(false);
 		});
 		ngApp.controller('monsterGraphController', function($scope, $http) {
-			$scope.isLoaded = false;
-			var nodes = [];
-			var edges = []
-
-			url = 'api/relationGraph';
-
-			$http({
-				method : 'GET',
-				url : url
-			}).then(
-					function successCallback(response) {
-						var node;
-						var edge;
-						var groupCount = 1;
-						angular.forEach(response.data.groups, function(group) {
-							network.body.data.nodes.add({
-								id : group.id,
-								label : group.name,
-								group : groupCount,
-								hidden : false
-							});
-							angular.forEach(group.articles, function(article) {
-								var isArticleExist = false;
-								angular.forEach(network.body.data.nodes,
-										function(element) {
-											if (element.id == article.id) {
-												isArticleExist = true;
-											}
-										});
-								if (!isArticleExist) {
-									network.body.data.nodes.add({
-										id : article.id,
-										label : article.title,
-										group : 'articles',
-										hidden : false
-									});
-								}
-
-								network.body.data.edges.add({
-									from : group.id,
-									to : article.id
-								});
-								groupCount++;
-							});
-						});
-						$scope.isLoaded = true;
-					}, function errorCallback(response) {
-					});
-
-			var container = document.getElementById('mynetwork');
-			var data = {
-				nodes : nodes,
-				edges : edges
-			};
-
 			var options = {
+
+				physics : {
+					stabilization : {
+						enabled : true,
+						iterations : 10
+					}
+				},
+				layout : {
+					improvedLayout : true
+				},
 				nodes : {
 					icon : {
 						face : "'Font Awesome 5 Free'",
@@ -158,28 +113,62 @@
 					}
 				}
 			};
-			var network = new vis.Network(container, data, options);
-			$scope.toggleArticles = function() {
-				angular.forEach(network.body.data.nodes, function(node) {
-					if (node.group == 'articles') {
-						network.body.data.nodes.update([ {
-							id : node.id,
-							hidden : !($scope.groupsCheckbox.articles)
-						} ]);
-					}
-				});
-			};
 
-			$scope.toggleSoftwares = function() {
-				angular.forEach(network.body.data.nodes, function(node) {
-					if (node.group == 'softwares') {
-						network.body.data.nodes.update([ {
-							id : node.id,
-							hidden : !($scope.groupsCheckbox.softwares)
-						} ]);
-					}
+			$scope.isLoaded = false;
+			var nodes = [];
+			var edges = []
+
+			$http({
+				method : 'GET',
+				url : 'api/relationGraph'
+			}).then(function successCallback(response) {
+				var groupCount = 1;
+				angular.forEach(response.data.groups, function(group) {
+					nodes.push({
+						id : group.id,
+						label : group.name,
+						group : groupCount,
+						hidden : false
+					});
+					angular.forEach(group.articles, function(article) {
+						var isArticleExist = false;
+						angular.forEach(nodes, function(element) {
+							if (element.id == article.id) {
+								isArticleExist = true;
+							}
+						});
+						if (!isArticleExist) {
+							nodes.push({
+								id : article.id,
+								label : article.title,
+								group : 'articles',
+								hidden : false
+							});
+						}
+
+						edges.push({
+							from : group.id,
+							to : article.id
+						});
+					});
+					groupCount++;
 				});
-			};
+
+				var container = document.getElementById('mynetwork');
+				var data = {
+					nodes : nodes,
+					edges : edges
+				};
+
+				var network = new vis.Network(container, {}, options);
+				network.once("animationFinished", function() {
+					$scope.isLoaded = true;
+					console.log("yoo");
+				});
+				network.setData(data);
+				$scope.isLoaded = true;
+			}, function errorCallback(response) {
+			});
 		});
 	</script>
 </body>
