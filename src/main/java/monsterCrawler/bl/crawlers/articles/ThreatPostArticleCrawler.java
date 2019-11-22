@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import monsterCrawler.entities.Group;
 
 @Named
-public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
+public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
 	private static final String SEARCH = "?s=";
 	private static final String API_URL = "wp-admin/admin-ajax.php";
 
@@ -24,12 +24,12 @@ public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private String ThreatPostUrl;
 
 	@Override
-	public String buildUrl(Group entity) {
-		return ThreatPostUrl + SEARCH + '"' + encodeUrl(entity.getName()) + '"';
+	public String buildUrl(String name) {
+		return ThreatPostUrl + SEARCH + '"' + encodeUrl(name) + '"';
 	}
 
 	@Override
-	public String buildSearchUrl(Group entity, int currentPage) {
+	public String buildSearchUrl(String name, int currentPage) {
 		return ThreatPostUrl + API_URL;
 	}
 
@@ -54,9 +54,9 @@ public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> {
 	}
 
 	@Override
-	public Document getSearchPage(Group entity, int pageIndex) throws IOException {
-		return createConnection(buildSearchUrl(entity, pageIndex)).data("action", "loadmore")
-				.data("query", encodeUrl("{\"s\":\"" + entity.getName() + "\",\"order\":\"DESC\"}"))
+	public Document getPage(String name, int pageIndex) throws IOException {
+		return createConnection(buildSearchUrl(name, pageIndex)).data("action", "loadmore")
+				.data("query", encodeUrl("{\"s\":\"" + name + "\",\"order\":\"DESC\"}"))
 				.data("page", Integer.toString(pageIndex)).post();
 	}
 

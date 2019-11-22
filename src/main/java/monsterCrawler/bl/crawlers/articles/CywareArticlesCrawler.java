@@ -13,11 +13,21 @@ import org.springframework.beans.factory.annotation.Value;
 import monsterCrawler.entities.Group;
 
 @Named
-public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> {
+public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
 	private static final String SEARCH = "search/";
 
 	@Value("${CYWARE_URL}")
 	private String cywareUrl;
+
+	@Override
+	public String buildUrl(String name) {
+		return cywareUrl + SEARCH + name;
+	}
+
+	@Override
+	public String buildSearchUrl(String name, int currentPage) {
+		return EMPTY;
+	}
 
 	@Override
 	public Elements extractArticlesElements(Document doc) {
@@ -25,15 +35,9 @@ public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> {
 	}
 
 	@Override
-	public Elements loadAndExtractNextArticles(Group entity) {
+	public Elements loadAndExtractNextArticles(Group entity, String name) {
 		// TODO
 		return new Elements();
-	}
-
-	@Override
-	public String buildSearchUrl(Group entity, int currentPage) {
-		// TODO
-		return EMPTY;
 	}
 
 	@Override
@@ -45,11 +49,6 @@ public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> {
 	@Override
 	public String extractTitle(Element article) {
 		return article.selectFirst("img").attr("title");
-	}
-
-	@Override
-	public String buildUrl(Group entity) {
-		return cywareUrl + SEARCH + entity.getName();
 	}
 
 	@Override

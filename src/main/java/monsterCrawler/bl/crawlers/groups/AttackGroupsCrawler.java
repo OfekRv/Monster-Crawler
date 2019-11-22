@@ -15,6 +15,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 
 import lombok.extern.slf4j.Slf4j;
 import monsterCrawler.entities.Group;
@@ -37,7 +38,8 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 
 	private static final String TACTICS_SEPERATOR = ",";
 
-	private String groupsUrl = "https://attack.mitre.org/groups/";
+	@Value("${MITRE_ATTACK_GROUPS_URL}")
+	private String groupsUrl;
 
 	@Inject
 	private GroupRepository groupsRepository;

@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import monsterCrawler.entities.Group;
 
 @Named
-public class ZdnetArticleCrawler extends AbstractArticlesCrawler<Group> {
+public class ZdnetArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
 	private static final String SEARCH = "search/";
 	private static final String SEARCH_QUERY = "?o=1&q=";
 
@@ -21,13 +21,13 @@ public class ZdnetArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private String zdnetUrl;
 
 	@Override
-	public String buildUrl(Group entity) {
-		return zdnetUrl + SEARCH + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
+	public String buildUrl(String name) {
+		return zdnetUrl + SEARCH + SEARCH_QUERY + '"' + encodeUrl(name) + '"';
 	}
 
 	@Override
-	public String buildSearchUrl(Group entity, int currentPage) {
-		return zdnetUrl + SEARCH + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
+	public String buildSearchUrl(String name, int currentPage) {
+		return zdnetUrl + SEARCH + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(name) + '"';
 	}
 
 	@Override

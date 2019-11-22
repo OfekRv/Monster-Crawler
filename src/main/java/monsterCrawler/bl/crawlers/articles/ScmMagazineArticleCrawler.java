@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import monsterCrawler.entities.Group;
 
 @Named
-public class ScmMagazineArticleCrawler extends AbstractArticlesCrawler<Group> {
+public class ScmMagazineArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
 	private static final String SEARCH_QUERY = "?s=";
 	private static final String PAGE = "page/";
 
@@ -23,13 +23,13 @@ public class ScmMagazineArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private String scmUrl;
 
 	@Override
-	public String buildUrl(Group entity) {
-		return scmUrl + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
+	public String buildUrl(String name) {
+		return scmUrl + SEARCH_QUERY + '"' + encodeUrl(name) + '"';
 	}
 
 	@Override
-	public String buildSearchUrl(Group entity, int currentPage) {
-		return scmUrl + PAGE + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(entity.getName()) + '"';
+	public String buildSearchUrl(String name, int currentPage) {
+		return scmUrl + PAGE + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(name) + '"';
 	}
 
 	@Override

@@ -21,7 +21,7 @@ import monsterCrawler.entities.Article;
 import monsterCrawler.entities.Group;
 
 @Named
-public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> {
+public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
 	private static final String SEARCH = "search.html?q=";
 	private static final String RESULTS_PER_PAGE = "&numResultsPerPage=500";
 
@@ -29,8 +29,8 @@ public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> {
 	private String fireeyeUrl;
 
 	@Override
-	public void CrawlArticle(Group entityToCrawl, Element articleElement) {
-		super.CrawlArticle(entityToCrawl, articleElement);
+	public void CrawlArticle(Group entityToCrawl, String name, Element articleElement) {
+		super.CrawlArticle(entityToCrawl, name, articleElement);
 		String url = extractUrl(articleElement);
 		if (getArticlesRepository().existsByUrl(url)) {
 			Article crawledArticle = getArticlesRepository().findByUrl(url);
@@ -43,8 +43,13 @@ public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> {
 	}
 
 	@Override
-	public String buildUrl(Group entity) {
-		return fireeyeUrl + SEARCH + '"' + encodeUrl(entity.getName()) + '"' + RESULTS_PER_PAGE;
+	public String buildUrl(String name) {
+		return fireeyeUrl + SEARCH + '"' + encodeUrl(name) + '"' + RESULTS_PER_PAGE;
+	}
+
+	@Override
+	public String buildSearchUrl(String name, int currentPage) {
+		return EMPTY;
 	}
 
 	@Override
@@ -84,15 +89,9 @@ public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> {
 	}
 
 	@Override
-	public Elements loadAndExtractNextArticles(Group entity) {
+	public Elements loadAndExtractNextArticles(Group entity, String name) {
 		// dont need because of RESULTS_PER_PAGE
 		return new Elements();
-	}
-
-	@Override
-	public String buildSearchUrl(Group entity, int currentPage) {
-		// dont need because of RESULTS_PER_PAGE
-		return EMPTY;
 	}
 
 	@Override

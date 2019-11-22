@@ -23,7 +23,7 @@ public class CrawlersManager {
 
 	public void crawl() {
 		log.info("Started executing groups crawler");
-		groupsCrawler.crawl();
+	//	groupsCrawler.crawl();
 		log.info("Finished executing groups crawler");
 
 		log.info("Started executing atricles crawler");

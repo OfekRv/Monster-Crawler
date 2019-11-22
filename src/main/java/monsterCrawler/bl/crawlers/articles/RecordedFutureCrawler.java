@@ -21,7 +21,7 @@ import monsterCrawler.entities.Article;
 import monsterCrawler.entities.Group;
 
 @Named
-public class RecordedFutureCrawler extends AbstractArticlesCrawler<Group> {
+public class RecordedFutureCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
 	private static final String SEARCH = "/?s=";
 	private static final String PAGE = "page/";
 
@@ -29,8 +29,8 @@ public class RecordedFutureCrawler extends AbstractArticlesCrawler<Group> {
 	private String recordedFutureUrl;
 
 	@Override
-	public void CrawlArticle(Group entityToCrawl, Element articleElement) {
-		super.CrawlArticle(entityToCrawl, articleElement);
+	public void CrawlArticle(Group entityToCrawl, String name, Element articleElement) {
+		super.CrawlArticle(entityToCrawl, name, articleElement);
 		String url = extractUrl(articleElement);
 		if (getArticlesRepository().existsByUrl(url)) {
 			Article crawledArticle = getArticlesRepository().findByUrl(url);
@@ -43,13 +43,13 @@ public class RecordedFutureCrawler extends AbstractArticlesCrawler<Group> {
 	}
 
 	@Override
-	public String buildUrl(Group entity) {
-		return recordedFutureUrl + SEARCH + '"' + encodeUrl(entity.getName()) + '"';
+	public String buildUrl(String name) {
+		return recordedFutureUrl + SEARCH + '"' + encodeUrl(name) + '"';
 	}
 
 	@Override
-	public String buildSearchUrl(Group entity, int currentPage) {
-		return recordedFutureUrl + PAGE + currentPage + SEARCH + '"' + encodeUrl(entity.getName()) + '"';
+	public String buildSearchUrl(String name, int currentPage) {
+		return recordedFutureUrl + PAGE + currentPage + SEARCH + '"' + encodeUrl(name) + '"';
 	}
 
 	@Override

@@ -9,7 +9,10 @@ import static monsterCrawler.utils.CrawelersUtils.paddedWithSpaces;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,25 +27,32 @@ import monsterCrawler.repositories.ArticleRepository;
 
 public interface ArticlesCrawler<E extends NamedEntity> {
 	public default void crawl(E entityToCrawl) {
-		try {
-			Document doc = getRequest(buildUrl(entityToCrawl));
-			Elements articlesElements = extractArticlesElements(doc);
-			articlesElements.addAll(loadAndExtractNextArticles(entityToCrawl));
-			for (Element articleElement : articlesElements) {
-				CrawlArticle(entityToCrawl, articleElement);
+		Set<String> entityNames = new HashSet<>();
+		entityNames.addAll(getAlternativeEntityNames(entityToCrawl));
+		entityNames.add(entityToCrawl.getName());
+		String url;
+		for (String entityName : entityNames) {
+			url = buildUrl(entityName);
+			try {
+				Document doc = getRequest(url);
+				Elements articlesElements = extractArticlesElements(doc);
+				articlesElements.addAll(loadAndExtractNextArticles(entityToCrawl, entityName));
+				for (Element articleElement : articlesElements) {
+					CrawlArticle(entityToCrawl, entityName, articleElement);
+				}
+			} catch (IOException e) {
+				getLogger().warn("[ARTICLE] Could not search server with crawler: " + this.getClass().getName()
+						+ " for entity: " + entityToCrawl.getName());
 			}
-		} catch (IOException e) {
-			getLogger().warn("[ARTICLE] Could not search server with crawler: " + this.getClass().getName()
-					+ " for entity: " + entityToCrawl.getName());
 		}
 	}
 
-	public default void CrawlArticle(E entityToCrawl, Element articleElement) {
+	public default void CrawlArticle(E entityToCrawl, String name, Element articleElement) {
 		String articleUrl = extractUrl(articleElement);
 		getLogger().info("[ARTICLE] getting \"" + articleUrl + "\"");
 		String content = downloadAsCleanHtml(articleUrl);
 
-		if (content.contains(paddedWithSpaces(entityToCrawl.getName()))) {
+		if (content.contains(paddedWithSpaces(name))) {
 			Article article;
 			if (getArticlesRepository().existsByUrl(articleUrl)) {
 				article = getArticlesRepository().findByUrl(articleUrl);
@@ -56,7 +66,6 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 				article = relateEntityAndSave(entityToCrawl, article);
 				getArticlesContentRepository().saveAndFlush(new ArticleContent(article.getId(), content));
 			}
-
 		}
 	}
 
@@ -65,15 +74,15 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		return getArticlesRepository().saveAndFlush(article);
 	}
 
-	public default Elements loadAndExtractNextArticles(E entity) {
+	public default Elements loadAndExtractNextArticles(E entity, String name) {
 		int currentPage = getFirstSearchPageIndex();
 		int lastPage = getPageLimit();
 		Elements articlesElements = new Elements();
-		Elements currentArticlesElements;
+		Elements currentArticlesElements = new Elements();
 		Document doc;
 		do {
 			try {
-				doc = getSearchPage(entity, currentPage);
+				doc = getPage(name, currentPage);
 			} catch (IOException e) {
 				getLogger()
 						.warn("[ARTICLE] Could not get next articles, maybe not exists or server problem. stopped before page number "
@@ -82,15 +91,10 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 			}
 
 			currentArticlesElements = extractArticlesElements(doc);
-			articlesElements.addAll(currentArticlesElements);
 			currentPage++;
 		} while (!currentArticlesElements.isEmpty() && currentPage <= lastPage);
 
 		return articlesElements;
-	}
-
-	public default Document getSearchPage(E entity, int pageIndex) throws IOException {
-		return getRequestIgnoringBadStatusCode(buildSearchUrl(entity, pageIndex));
 	}
 
 	public default LocalDate getArticleDate(Element article) {
@@ -103,9 +107,19 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		}
 	}
 
-	public String buildUrl(E entity);
+	public default Document getPage(String name, int currentPage) throws IOException {
+		return getRequestIgnoringBadStatusCode(buildSearchUrl(name, currentPage));
+	}
 
-	public String buildSearchUrl(E entity, int currentPage);
+	public Collection<String> buildUrls(E entity);
+
+	public Collection<String> buildSearchUrls(E entity, int currentPage);
+
+	public Collection<String> getAlternativeEntityNames(E entity);
+
+	public String buildUrl(String name);
+
+	public String buildSearchUrl(String name, int currentPage);
 
 	public String extractTitle(Element article);
 
@@ -117,9 +131,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 
 	public int getFirstSearchPageIndex();
 
-	public default int getPageLimit() {
-		return 20;
-	}
+	public int getPageLimit();
 
 	public ArticleRepository getArticlesRepository();
 
