@@ -17,10 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 public class CrawelersUtils {
 	public static String EMPTY = "";
 
-	private static final String htmlTagsBlackList = "script,link,footer,img,image,iframe,.hidden,style,path,meta,form";
-
 	public static Document getRequest(String url) throws IOException {
-		return Jsoup.connect(url).get();
+		Connection con = Jsoup.connect(url);
+		return con.get();
 	}
 
 	public static Document getRequestIgnoringBadStatusCode(String url) throws IOException {
@@ -34,7 +33,6 @@ public class CrawelersUtils {
 	public static String downloadAsCleanHtml(String url) {
 		try {
 			Document doc = getRequest(url);
-			doc.select(htmlTagsBlackList).remove();
 			return doc.html();
 		} catch (IOException e) {
 			log.warn("[ARTICLE] Could not download \"" + url + "\" " + "mayble not exist or server error");

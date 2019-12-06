@@ -50,7 +50,7 @@
 				physics : {
 					stabilization : {
 						enabled : true,
-						iterations : 10
+						iterations : 1
 					}
 				},
 				layout : {
@@ -161,10 +161,6 @@
 				};
 
 				var network = new vis.Network(container, {}, options);
-				network.once("animationFinished", function() {
-					$scope.isLoaded = true;
-					console.log("yoo");
-				});
 				network.setData(data);
 				$scope.isLoaded = true;
 			}, function errorCallback(response) {
