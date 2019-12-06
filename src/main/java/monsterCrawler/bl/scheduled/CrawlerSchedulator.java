@@ -14,11 +14,11 @@ public class CrawlerSchedulator {
 
 	@Scheduled(cron = "${ARTICLES_CRAWLER_EXECUTION_TIMING}")
 	public void executeArticlesCrawler() {
-		crawlersManager.crawlArticles();
+		crawlersManager.crawl();
 	}
 
 	@Scheduled(cron = "${GROUPS_CRAWLER_EXECUTION_TIMING}")
 	public void executeGroupsCrawler() {
-		crawlersManager.crawlArticles();
+		crawlersManager.crawl();
 	}
 }
