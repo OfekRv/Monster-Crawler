@@ -33,6 +33,8 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 	private static final int SOFTWARE_INDEX = 1;
 	private static final int TECHNIQUE_INDEX = 2;
 
+	private static final int OVERVIEW_INDEX = 0;
+
 	private static final int ID_PREFIX_CHAR_COUNT = 4;
 	private static final int TACTIC_PREFIX_CHAR_COUNT = 8;
 
@@ -68,8 +70,9 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 	}
 
 	private Collection<String> extractGroupLinksElements(Document doc) {
-		return doc.getElementsByClass("group-nav-desktop-view").select("a").next().stream()
-				.map(link -> link.absUrl("href")).collect(Collectors.toList());
+		Elements groups = doc.getElementsByClass("group-nav-desktop-view").select("a");
+		groups.remove(OVERVIEW_INDEX);
+		return groups.stream().map(link -> link.absUrl("href")).collect(Collectors.toList());
 	}
 
 	private Collection<String> extractGroupAliases(Document doc) {
