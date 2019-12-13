@@ -1,9 +1,11 @@
 package monsterCrawler.bl.crawlers;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.transaction.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 import monsterCrawler.bl.crawlers.articles.ArticlesCrawler;
@@ -23,11 +25,12 @@ public class CrawlersManager {
 
 	public void crawlArticles() {
 		log.info("Started executing atricles crawler");
-		for (Group group : groupRepository.findAll()) {
+		for (Group group : groupRepository.findAllByOrderByLastScanAsc()) {
 			log.info("[GROUP] " + group.getName());
 			for (ArticlesCrawler<Group> articlesCrawler : articlesCrawlers) {
 				articlesCrawler.crawl(group);
 			}
+			updateLastScan(group);
 		}
 		log.info("Finished executing articles crawler");
 	}
@@ -36,5 +39,11 @@ public class CrawlersManager {
 		log.info("Started executing groups crawler");
 		groupsCrawler.crawl();
 		log.info("Finished executing groups crawler");
+	}
+
+	@Transactional
+	private void updateLastScan(Group group) {
+		group.setLastScan(LocalDate.now());
+		groupRepository.saveAndFlush(group);
 	}
 }

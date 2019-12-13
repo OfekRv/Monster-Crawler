@@ -12,9 +12,9 @@
 		<relativePath />
 	</parent>
 
-	<groupId>Rvn</groupId>
+	<groupId>m0n5ter</groupId>
 	<artifactId>Monster-Crawler</artifactId>
-	<version>0.4.1</version>
+	<version>0.5.0</version>
 	<name>Monster-Crawler</name>
 
 	<dependencies>

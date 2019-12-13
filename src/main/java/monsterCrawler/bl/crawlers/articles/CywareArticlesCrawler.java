@@ -35,9 +35,8 @@ public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> implem
 	}
 
 	@Override
-	public Elements loadAndExtractNextArticles(Group entity, String name) {
+	public void crawlNextPagesArticles(Group entity, String name) {
 		// TODO
-		return new Elements();
 	}
 
 	@Override

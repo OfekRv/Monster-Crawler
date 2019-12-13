@@ -89,9 +89,8 @@ public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> implem
 	}
 
 	@Override
-	public Elements loadAndExtractNextArticles(Group entity, String name) {
+	public void crawlNextPagesArticles(Group entity, String name) {
 		// dont need because of RESULTS_PER_PAGE
-		return new Elements();
 	}
 
 	@Override

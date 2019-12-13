@@ -27,19 +27,16 @@ import monsterCrawler.repositories.ArticleRepository;
 
 public interface ArticlesCrawler<E extends NamedEntity> {
 	public default void crawl(E entityToCrawl) {
-		Set<String> entityNames = new HashSet<>();
+		Set<String> entityNames = new HashSet<String>();
 		entityNames.addAll(getAlternativeEntityNames(entityToCrawl));
 		entityNames.add(entityToCrawl.getName());
 		String url;
 		for (String entityName : entityNames) {
 			url = buildUrl(entityName);
 			try {
-				Document doc = getRequest(url);
-				Elements articlesElements = extractArticlesElements(doc);
-				articlesElements.addAll(loadAndExtractNextArticles(entityToCrawl, entityName));
-				for (Element articleElement : articlesElements) {
-					CrawlArticle(entityToCrawl, entityName, articleElement);
-				}
+				extractArticlesElements(getRequest(url))
+						.forEach(article -> CrawlArticle(entityToCrawl, entityName, article));
+				crawlNextPagesArticles(entityToCrawl, entityName);
 			} catch (IOException e) {
 				getLogger().warn("[ARTICLE] Could not search server with crawler: " + this.getClass().getName()
 						+ " for entity: " + entityToCrawl.getName());
@@ -49,18 +46,23 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 
 	public default void CrawlArticle(E entityToCrawl, String name, Element articleElement) {
 		String articleUrl = extractUrl(articleElement);
-		getLogger().info("[ARTICLE] getting \"" + articleUrl + "\"");
-		String content = downloadAsCleanHtml(articleUrl);
+		Article article;
+		String content;
+		getLogger().info("[ARTICLE] checking \"" + articleUrl + "\"");
 
-		if (content.contains(paddedWithSpaces(name))) {
-			Article article;
-			if (getArticlesRepository().existsByUrl(articleUrl)) {
-				article = getArticlesRepository().findByUrl(articleUrl);
-				if (!article.isRelatedEntity(entityToCrawl)) {
+		if (getArticlesRepository().existsByUrl(articleUrl)) {
+			article = getArticlesRepository().findByUrl(articleUrl);
+			if (!article.isRelatedEntity(entityToCrawl)) {
+				content = getArticlesContentRepository().findById(article.getId()).get().getContent();
+				if (content.contains(paddedWithSpaces(name))) {
 					getLogger().info("[ARTICLE] found another related entity in \"" + articleUrl + "\"");
 					relateEntityAndSave(entityToCrawl, article);
 				}
-			} else {
+			}
+		} else {
+			content = downloadAsCleanHtml(articleUrl);
+			getLogger().info("[ARTICLE] downloading \"" + articleUrl + "\"");
+			if (content.contains(paddedWithSpaces(name))) {
 				getLogger().info("[ARTICLE] saving \"" + articleUrl + "\"");
 				article = new Article(articleUrl, extractTitle(articleElement), getArticleDate(articleElement));
 				article = relateEntityAndSave(entityToCrawl, article);
@@ -74,27 +76,24 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		return getArticlesRepository().saveAndFlush(article);
 	}
 
-	public default Elements loadAndExtractNextArticles(E entity, String name) {
+	public default void crawlNextPagesArticles(E entity, String name) {
 		int currentPage = getFirstSearchPageIndex();
 		int lastPage = getPageLimit();
-		Elements articlesElements = new Elements();
 		Elements currentArticlesElements = new Elements();
 		Document doc;
 		do {
 			try {
 				doc = getPage(name, currentPage);
+				currentArticlesElements = extractArticlesElements(doc);
+				currentArticlesElements.forEach(article -> CrawlArticle(entity, name, article));
 			} catch (IOException e) {
 				getLogger()
 						.warn("[ARTICLE] Could not get next articles, maybe not exists or server problem. stopped before page number "
 								+ currentPage + " (" + this.getClass().getName() + ")");
-				return articlesElements;
 			}
 
-			currentArticlesElements = extractArticlesElements(doc);
 			currentPage++;
 		} while (!currentArticlesElements.isEmpty() && currentPage <= lastPage);
-
-		return articlesElements;
 	}
 
 	public default LocalDate getArticleDate(Element article) {
