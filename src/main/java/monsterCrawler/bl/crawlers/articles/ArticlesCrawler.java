@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -71,6 +73,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		}
 	}
 
+	@Transactional
 	public default Article relateEntityAndSave(E entityToCrawl, Article article) {
 		article.addRelatedEntity(entityToCrawl);
 		return getArticlesRepository().saveAndFlush(article);
