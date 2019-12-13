@@ -24,7 +24,7 @@ public class CrawlersManager {
 	private GroupRepository groupRepository;
 
 	public void crawlArticles() {
-		log.info("Started executing atricles crawler");
+		log.info("Started executing articles crawler");
 		for (Group group : groupRepository.findAllByOrderByLastScanAsc()) {
 			log.info("[GROUP] " + group.getName());
 			for (ArticlesCrawler<Group> articlesCrawler : articlesCrawlers) {

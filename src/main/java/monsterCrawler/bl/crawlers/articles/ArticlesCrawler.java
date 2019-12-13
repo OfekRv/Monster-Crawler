@@ -36,7 +36,7 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 		for (String entityName : entityNames) {
 			url = buildUrl(entityName);
 			try {
-				extractArticlesElements(getRequest(url))
+				extractArticlesElements(getRequest(url)).stream().filter(article -> isArticleToCrawl(article))
 						.forEach(article -> CrawlArticle(entityToCrawl, entityName, article));
 				crawlNextPagesArticles(entityToCrawl, entityName);
 			} catch (IOException e) {
@@ -112,6 +112,8 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 	public default Document getPage(String name, int currentPage) throws IOException {
 		return getRequestIgnoringBadStatusCode(buildSearchUrl(name, currentPage));
 	}
+
+	public boolean isArticleToCrawl(Element articleElement);
 
 	public Collection<String> buildUrls(E entity);
 
