@@ -35,11 +35,10 @@ public class FireeyeArticleCrawler extends AbstractArticlesCrawler<Group> implem
 
 	@Override
 	public void CrawlArticle(Group entityToCrawl, String name, Element articleElement) {
-		super.CrawlArticle(entityToCrawl, name, articleElement);
 		String url = extractUrl(articleElement);
 		super.CrawlArticle(entityToCrawl, name, articleElement);
 		Article crawledArticle = getArticlesRepository().findByUrl(url);
-		if (crawledArticle.getDate() == null) {
+		if (crawledArticle != null && crawledArticle.getDate() == null) {
 			crawledArticle.setDate(extractArticleDateFromInsideTheArticle(
 					Jsoup.parse(getArticlesContentRepository().findById(crawledArticle.getId()).get().getContent())));
 			getArticlesRepository().saveAndFlush(crawledArticle);
