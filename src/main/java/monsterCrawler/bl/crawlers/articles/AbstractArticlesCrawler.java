@@ -27,7 +27,7 @@ public abstract class AbstractArticlesCrawler<E extends NamedEntity> implements 
 	@Override
 	public boolean isArticleToCrawl(Element articleElement) {
 		LocalDate articleDate = getArticleDate(articleElement);
-		return articleDate != null && getArticleDate(articleElement).getYear() >= startYear;
+		return articleDate != null && articleDate.getYear() >= startYear;
 	}
 
 	@Override

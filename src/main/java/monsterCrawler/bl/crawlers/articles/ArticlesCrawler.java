@@ -88,7 +88,8 @@ public interface ArticlesCrawler<E extends NamedEntity> {
 			try {
 				doc = getPage(name, currentPage);
 				currentArticlesElements = extractArticlesElements(doc);
-				currentArticlesElements.forEach(article -> CrawlArticle(entity, name, article));
+				currentArticlesElements.stream().filter(article -> isArticleToCrawl(article))
+						.forEach(article -> CrawlArticle(entity, name, article));
 			} catch (IOException e) {
 				getLogger()
 						.warn("[ARTICLE] Could not get next articles, maybe not exists or server problem. stopped before page number "

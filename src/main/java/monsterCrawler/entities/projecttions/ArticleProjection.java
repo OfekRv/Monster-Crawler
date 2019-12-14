@@ -10,11 +10,12 @@ import monsterCrawler.entities.Group;
 
 @Projection(name = "article", types = { Article.class })
 public interface ArticleProjection {
-	public String getTitle();
+
+	public Collection<Group> getGroups();
 
 	public String getUrl();
 
 	public LocalDate getDate();
 
-	public Collection<Group> getGroups();
+	public String getTitle();
 }
