@@ -9,6 +9,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +29,10 @@ public class CrawelersUtils {
 
 	public static Element getFirstElementByClass(Element e, String className) {
 		return e.getElementsByClass(className).first();
+	}
+
+	public static Elements getElementsByClass(Element e, String className) {
+		return e.getElementsByClass(className);
 	}
 
 	public static String downloadAsCleanHtml(String url) {
