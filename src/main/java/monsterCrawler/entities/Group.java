@@ -48,16 +48,4 @@ public class Group implements NamedEntity {
 	private Set<Article> articles;
 	@Column(nullable = true, unique = false)
 	private LocalDate lastScan;
-
-	public Group(String id, String name, String description, Collection<String> aliases, Set<Technique> techniques,
-			Set<Software> softwares, LocalDate lastScan) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.aliases = aliases;
-		this.techniques = techniques;
-		this.softwares = softwares;
-		this.lastScan = lastScan;
-	}
 }

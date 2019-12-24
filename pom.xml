@@ -14,7 +14,7 @@
 
 	<groupId>m0n5ter</groupId>
 	<artifactId>Monster-Crawler</artifactId>
-	<version>0.6.0</version>
+	<version>0.6.1</version>
 	<name>Monster-Crawler</name>
 
 	<dependencies>

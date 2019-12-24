@@ -61,7 +61,7 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 				String groupName = extractName(doc);
 				log.info("[GROUP] getting \"" + groupName + "\"");
 				currentGroup = new Group(extractId(doc), groupName, extractDescription(doc), extractGroupAliases(doc),
-						getGroupTechniques(doc), getGroupSoftwares(doc), null);
+						getGroupTechniques(doc), getGroupSoftwares(doc), null, null);
 				groupsRepository.saveAndFlush(currentGroup);
 			}
 		} catch (IOException e) {
