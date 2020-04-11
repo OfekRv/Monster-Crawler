@@ -38,12 +38,6 @@ public class Group implements NamedEntity {
 	@CollectionTable(name = "atk_group_aliases")
 	@Column(nullable = true, unique = false)
 	private Collection<String> aliases;
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "atk_techniques_in_groups", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "technique_id"))
-	private Set<Technique> techniques;
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "atk_softwares_in_groups", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "software_id"))
-	private Set<Software> softwares;
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups")
 	private Set<Article> articles;
 	@Column(nullable = true, unique = false)

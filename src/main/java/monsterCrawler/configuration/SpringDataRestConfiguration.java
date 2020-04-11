@@ -6,16 +6,12 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapt
 
 import monsterCrawler.entities.Article;
 import monsterCrawler.entities.Group;
-import monsterCrawler.entities.Software;
-import monsterCrawler.entities.Technique;
 
 @Configuration
 public class SpringDataRestConfiguration extends RepositoryRestConfigurerAdapter {
 	@Override
 	public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
 		config.exposeIdsFor(Group.class);
-		config.exposeIdsFor(Technique.class);
-		config.exposeIdsFor(Software.class);
 		config.exposeIdsFor(Article.class);
 	}
 }
