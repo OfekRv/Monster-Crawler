@@ -1,4 +1,5 @@
 package monsterCrawler.configuration;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -7,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 @Component
 public class HeaderConfiguration extends OncePerRequestFilter {
 
@@ -16,6 +18,7 @@ public class HeaderConfiguration extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
         httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 }
