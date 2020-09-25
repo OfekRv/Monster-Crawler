@@ -18,7 +18,6 @@ public class HeaderConfiguration extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
         httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
-        httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 }
