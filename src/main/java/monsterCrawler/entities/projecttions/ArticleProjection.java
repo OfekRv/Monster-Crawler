@@ -10,6 +10,8 @@ import monsterCrawler.entities.Group;
 
 @Projection(name = "article", types = { Article.class })
 public interface ArticleProjection {
+	public String getId();
+
 	public String getTitle();
 
 	public String getUrl();
