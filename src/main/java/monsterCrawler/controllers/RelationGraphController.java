@@ -22,9 +22,9 @@ import monsterCrawler.repositories.GroupRepository;
 @RequestMapping("api/")
 public class RelationGraphController {
 	@Inject
-	ArticleRepository articleRepository;
+	private ArticleRepository articleRepository;
 	@Inject
-	GroupRepository groupRepository;
+	private GroupRepository groupRepository;
 
 	@GetMapping("/relationGraph")
 	public @ResponseBody GroupsRelations getRelationGraph() {

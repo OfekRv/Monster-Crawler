@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import monsterCrawler.entities.Group;
-import monsterCrawler.entities.projecttions.GroupProjection;
+import monsterCrawler.entities.projections.GroupProjection;
 
 @RepositoryRestResource(excerptProjection = GroupProjection.class)
 public interface GroupRepository extends JpaRepository<Group, String> {
