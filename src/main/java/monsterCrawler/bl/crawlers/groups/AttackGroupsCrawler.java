@@ -24,6 +24,8 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 	private static final int ID_INDEX = 0;
 	private static final int OVERVIEW_INDEX = 0;
 	private static final int ID_PREFIX_CHAR_COUNT = 4;
+	private static final int GROUP_WITH_ALIASES_MIN_TABLE_COUNT = 2;
+	private static final int ALIASES_TABLE = 0;
 
 	@Value("${MITRE_ATTACK_GROUPS_URL}")
 	private String groupsUrl;
@@ -69,11 +71,11 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 		Collection<String> aliases = new ArrayList<>();
 		Elements tableValues = doc.getElementsByClass("table table-bordered table-alternate mt-2");
 
-		if (tableValues.size() < 3) {
+		if (tableValues.size() < GROUP_WITH_ALIASES_MIN_TABLE_COUNT) {
 			return aliases;
 		}
 
-		tableValues = tableValues.get(0).select("td");
+		tableValues = tableValues.get(ALIASES_TABLE).select("td");
 
 		for (int i = 0; i < tableValues.size(); i += 2) {
 			aliases.add(tableValues.get(i).text());
