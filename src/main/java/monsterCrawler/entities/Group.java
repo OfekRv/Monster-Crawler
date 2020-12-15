@@ -42,6 +42,6 @@ public class Group implements NamedEntity {
 	private Collection<String> aliases;
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups")
 	private Set<Article> articles;
-	@Column(nullable = true, unique = false)
+	@Column(nullable = true, unique = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
 	private OffsetDateTime lastScan;
 }
