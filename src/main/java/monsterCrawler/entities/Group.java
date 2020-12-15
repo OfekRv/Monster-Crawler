@@ -1,6 +1,8 @@
 package monsterCrawler.entities;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Set;
 
@@ -41,5 +43,5 @@ public class Group implements NamedEntity {
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups")
 	private Set<Article> articles;
 	@Column(nullable = true, unique = false)
-	private LocalDate lastScan;
+	private OffsetDateTime lastScan;
 }

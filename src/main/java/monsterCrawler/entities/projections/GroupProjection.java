@@ -1,6 +1,7 @@
 package monsterCrawler.entities.projections;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 
 import org.springframework.data.rest.core.config.Projection;
@@ -17,5 +18,5 @@ public interface GroupProjection {
 
 	public Collection<String> getAliases();
 
-	public LocalDate getLastScan();
+	public OffsetDateTime getLastScan();
 }
