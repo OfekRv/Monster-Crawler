@@ -22,7 +22,7 @@ import monsterCrawler.entities.Group;
 
 @Named
 public class RecordedFutureCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
-	private static final String SEARCH = "/?s=";
+	private static final String SEARCH = "?s=";
 	private static final String PAGE = "page/";
 
 	@Value("${RECORDED_FUTURE_URL}")

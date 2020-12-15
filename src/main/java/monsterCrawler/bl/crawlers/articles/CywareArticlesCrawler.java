@@ -14,7 +14,7 @@ import monsterCrawler.entities.Group;
 
 @Named
 public class CywareArticlesCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
-	private static final String SEARCH = "search/";
+	private static final String SEARCH = "search?search=";
 
 	@Value("${CYWARE_URL}")
 	private String cywareUrl;
