@@ -9,8 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
-import javax.inject.Named;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,6 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import monsterCrawler.entities.Article;
 import monsterCrawler.entities.Group;
+
+import javax.inject.Named;
 
 @Named
 public class RecordedFutureCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
@@ -29,8 +29,8 @@ public class RecordedFutureCrawler extends AbstractArticlesCrawler<Group> implem
 	private String recordedFutureUrl;
 
 	@Override
-	public void CrawlArticle(Group entityToCrawl, String name, Element articleElement) {
-		super.CrawlArticle(entityToCrawl, name, articleElement);
+	public void crawlArticle(Group entityToCrawl, String name, Element articleElement) {
+		super.crawlArticle(entityToCrawl, name, articleElement);
 		String url = extractUrl(articleElement);
 		if (getArticlesRepository().existsByUrl(url)) {
 			Article crawledArticle = getArticlesRepository().findByUrl(url);
