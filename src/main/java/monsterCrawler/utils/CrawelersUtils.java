@@ -19,7 +19,7 @@ public class CrawelersUtils {
 	public static String EMPTY = "";
 
 	public static Document getRequest(String url) throws IOException {
-		Connection con = Jsoup.connect(url);
+		Connection con = Jsoup.connect(url).ignoreContentType(true);
 		return con.get();
 	}
 
