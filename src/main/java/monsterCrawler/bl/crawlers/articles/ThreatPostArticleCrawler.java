@@ -31,8 +31,8 @@ public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> imp
 
     @Override
     public Elements extractArticlesElements(Document doc) {
-        return doc.select("article").
-                select("c-card c-card--horizontal--half");
+        return getElementsByClass(doc,
+                "c-card c-card--horizontal--half@md c-card--horizontal@lg c-card--horizontal--flat@md js-post-item");
     }
 
     @Override

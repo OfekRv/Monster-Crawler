@@ -2,6 +2,7 @@ package monsterCrawler.bl.crawlers;
 
 import lombok.extern.slf4j.Slf4j;
 import monsterCrawler.bl.crawlers.articles.ArticlesCrawler;
+import monsterCrawler.bl.crawlers.articles.ThreatPostArticleCrawler;
 import monsterCrawler.bl.crawlers.groups.AttackGroupsCrawler;
 import monsterCrawler.entities.Group;
 import monsterCrawler.repositories.GroupRepository;
@@ -20,9 +21,13 @@ public class CrawlersManager {
     @Inject
     private Collection<ArticlesCrawler<Group>> articlesCrawlers;
     @Inject
+    private ThreatPostArticleCrawler tp;
+    @Inject
     private GroupRepository groupRepository;
 
     public void crawlArticles() {
+        tp.crawl(groupRepository.findById("G0032").get());
+
         log.info("Started executing articles crawler");
         for (Group group : groupRepository.findAllByOrderByLastScanAsc()) {
             log.info("[GROUP] " + group.getName());
