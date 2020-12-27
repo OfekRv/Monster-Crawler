@@ -1,7 +1,6 @@
 package monsterCrawler.utils;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 
 import javax.inject.Named;
@@ -25,10 +24,7 @@ public class CrawelersUtils {
 	}
 
 	public static Document getRequestIgnoringBadStatusCode(String url) throws IOException {
-		return Jsoup.connect(url).
-				ignoreHttpErrors(true).
-				header("Host",new URL(url).getHost()).
-				get();
+		return Jsoup.connect(url).ignoreHttpErrors(true).get();
 	}
 
 	public static Element getFirstElementByClass(Element e, String className) {
