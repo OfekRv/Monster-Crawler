@@ -12,42 +12,42 @@ import static monsterCrawler.utils.CrawelersUtils.encodeUrl;
 import static monsterCrawler.utils.CrawelersUtils.getFirstElementByClass;
 
 @Named
-public class NakedSecurityArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
-    private static final String SEARCH_QUERY = "?s=";
-    private static final String PAGE = "page/";
+public class WiredArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
+    private static final String SEARCH_QUERY = "search/?q=";
+    private static final String PAGE_QUERY = "&page=";
+    private static final String SORT = "&sort=publishDate,desc";
 
-    @Value("${NAKED_SECURITY_URL}")
-    private String nakedSecurityUrl;
+    @Value("${WIRED_URL}")
+    private String wiredUrl;
 
     @Override
     public String buildUrl(String name) {
-        return nakedSecurityUrl + SEARCH_QUERY + '"' + encodeUrl(name) + '"';
+        return wiredUrl + SEARCH_QUERY + '"' + encodeUrl(name) + '"' + SORT;
     }
 
     @Override
     public String buildSearchUrl(String name, int currentPage) {
-        return nakedSecurityUrl + PAGE + currentPage + "/" + SEARCH_QUERY + '"' + encodeUrl(name) + '"';
+        return wiredUrl + SEARCH_QUERY + '"' + encodeUrl(name) + '"' + PAGE_QUERY + currentPage + SORT;
     }
 
     @Override
     public String extractTitle(Element article) {
-        return article.selectFirst("h1").text();
+        return article.selectFirst("h2").text();
     }
 
     @Override
     public Elements extractArticlesElements(Document doc) {
-        return doc.select("main").
-                select("article:not(.error-404)");
+        return getFirstElementByClass(doc,"archive-list-component__items").select("li");
     }
 
     @Override
     public String extractArticleDate(Element article) {
-        return getFirstElementByClass(article, "result-meta").text().substring(0, 11);
+        return article.select("time").text();
     }
 
     @Override
     public String getDateFormatPattern() {
-        return "MMM dd yyyy";
+        return "MMMM d, yyyy";
     }
 
     @Override
