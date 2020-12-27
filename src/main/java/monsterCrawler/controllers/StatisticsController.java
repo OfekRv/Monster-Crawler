@@ -20,4 +20,9 @@ public class StatisticsController {
                                               @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate) {
         return bl.getGroupsArticlesCount(startDate, endDate);
     }
+
+    @GetMapping("/lastScanAvgMs")
+    public double getAverageScanTime() {
+        return bl.averageGroupScanTime();
+    }
 }
