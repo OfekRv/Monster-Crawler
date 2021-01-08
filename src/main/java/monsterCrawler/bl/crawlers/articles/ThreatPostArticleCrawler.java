@@ -1,15 +1,20 @@
 package monsterCrawler.bl.crawlers.articles;
 
-import monsterCrawler.entities.Group;
+import static monsterCrawler.utils.CrawelersUtils.createConnection;
+import static monsterCrawler.utils.CrawelersUtils.encodeUrl;
+import static monsterCrawler.utils.CrawelersUtils.getElementsByClass;
+import static monsterCrawler.utils.CrawelersUtils.getFirstElementByClass;
+
+import java.io.IOException;
+
+import javax.inject.Named;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.inject.Named;
-import java.io.IOException;
-
-import static monsterCrawler.utils.CrawelersUtils.*;
+import monsterCrawler.entities.Group;
 
 @Named
 public class ThreatPostArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {

@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
+import javax.inject.Named;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,8 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import monsterCrawler.entities.Article;
 import monsterCrawler.entities.Group;
-
-import javax.inject.Named;
 
 @Named
 public class RecordedFutureCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {

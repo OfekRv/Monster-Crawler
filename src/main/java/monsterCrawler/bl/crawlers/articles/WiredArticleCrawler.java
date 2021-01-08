@@ -1,15 +1,16 @@
 package monsterCrawler.bl.crawlers.articles;
 
-import monsterCrawler.entities.Group;
+import static monsterCrawler.utils.CrawelersUtils.encodeUrl;
+import static monsterCrawler.utils.CrawelersUtils.getFirstElementByClass;
+
+import javax.inject.Named;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.inject.Named;
-
-import static monsterCrawler.utils.CrawelersUtils.encodeUrl;
-import static monsterCrawler.utils.CrawelersUtils.getFirstElementByClass;
+import monsterCrawler.entities.Group;
 
 @Named
 public class WiredArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
