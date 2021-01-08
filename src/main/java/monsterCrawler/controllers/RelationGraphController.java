@@ -15,14 +15,11 @@ import monsterCrawler.entities.ArticleEntry;
 import monsterCrawler.entities.Group;
 import monsterCrawler.entities.GroupEntry;
 import monsterCrawler.entities.GroupsRelations;
-import monsterCrawler.repositories.ArticleRepository;
 import monsterCrawler.repositories.GroupRepository;
 
 @RestController
 @RequestMapping("api/")
 public class RelationGraphController {
-	@Inject
-	private ArticleRepository articleRepository;
 	@Inject
 	private GroupRepository groupRepository;
 

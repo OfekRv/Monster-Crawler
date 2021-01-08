@@ -1,6 +1,5 @@
 package monsterCrawler.entities.projections;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 
