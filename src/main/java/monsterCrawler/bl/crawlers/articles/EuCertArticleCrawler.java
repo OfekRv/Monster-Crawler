@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Value;
 
 import monsterCrawler.entities.Group;
 
-@Named
+// Disabled - Lots of fake news & duplications
+
+//@Named
 public class EuCertArticleCrawler extends AbstractArticlesCrawler<Group> implements GroupArticlesCrawler {
 	private static final String SEARCH_QUERY = "&edition=searcharticles&option=&atLeast=";
 	private static final String LANGUAGE = "dynamic?language=en";
