@@ -16,7 +16,7 @@ import monsterCrawler.repositories.FakeArticleRepository;
 
 @Slf4j
 public abstract class AbstractArticlesCrawler<E extends NamedEntity> implements ArticlesCrawler<E> {
-	@Value("${DEFUALT_SEARCH_PAGES_CRAWL_LIMIT}")
+	@Value("${DEFAULT_SEARCH_PAGES_CRAWL_LIMIT}")
 	private int pageLimit;
 	@Value("${CRAWL_START_YEAR}")
 	private int startYear;
