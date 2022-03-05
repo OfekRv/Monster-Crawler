@@ -61,7 +61,7 @@ public class AttackGroupsCrawler implements GroupsCrawler {
 	}
 
 	private Collection<String> extractGroupLinksElements(Document doc) {
-		Elements groups = doc.getElementsByClass("group-nav-desktop-view").select("a");
+		Elements groups = doc.getElementsByClass("side-nav-desktop-view").select("a");
 		groups.remove(OVERVIEW_INDEX);
 		return groups.stream().map(link -> link.absUrl("href")).collect(Collectors.toList());
 	}
